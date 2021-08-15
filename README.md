@@ -1,5 +1,10 @@
 # `vipers` 😎
 
+[![Crates.io](https://img.shields.io/crates/v/vipers?style=flat-square)](https://crates.io/crates/vipers)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](https://github.com/saber-hq/vipers/blob/master/LICENSE-APACHE)
+[![Build Status](https://img.shields.io/github/workflow/status/saber-hq/vipers/CI/master?style=flat-square)](https://github.com/saber-hq/vipers/actions/workflows/ci.yml?query=branch%3Amaster)
+[![Contributors](https://img.shields.io/github/contributors/saber-hq/vipers?style=flat-square)](https://github.com/saber-hq/vipers/graphs/contributors)
+
 Assorted checks and validations for writing safer Solana programs.
 
 ## Motivation
