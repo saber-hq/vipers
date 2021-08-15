@@ -5,7 +5,7 @@
 [![Build Status](https://img.shields.io/github/workflow/status/saber-hq/vipers/CI/master?style=flat-square)](https://github.com/saber-hq/vipers/actions/workflows/ci.yml?query=branch%3Amaster)
 [![Contributors](https://img.shields.io/github/contributors/saber-hq/vipers?style=flat-square)](https://github.com/saber-hq/vipers/graphs/contributors)
 
-![banner](/banner.png)
+![banner](/images/banner.png)
 
 Assorted checks and validations for writing safer Solana programs.
 
