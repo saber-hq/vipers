@@ -9,6 +9,7 @@ Solana's fee mechanism is unlike Ethereum's, in that the number of bytecode inst
 This library provides several utilities for Anchor programs to validate account structs and check for invariants.
 
 ## Support
+
 For support, join the Saber Discord at [chat.saber.so](https://chat.saber.so)!
 
 ## License
