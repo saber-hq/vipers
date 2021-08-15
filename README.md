@@ -6,11 +6,11 @@
 [![Contributors](https://img.shields.io/github/contributors/saber-hq/vipers?style=flat-square)](https://github.com/saber-hq/vipers/graphs/contributors)
 
 <p align="center">
+    <img src="/images/banner.png" />
+</p>
 
-![banner](/images/banner.png)
-
-Assorted checks and validations for writing safer Solana programs.
-
+<p align="center">
+    Assorted checks and validations for writing safer Solana programs.
 </p>
 
 ## Motivation
