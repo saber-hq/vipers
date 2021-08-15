@@ -1,0 +1,12 @@
+[package]
+name = "vipers"
+version = "0.1.0"
+authors = ["Saber Team <team@saber.so>"]
+edition = "2018"
+
+[dependencies]
+anchor-lang = "0.13.2"
+anchor-spl = "0.13.2"
+spl-associated-token-account = { version = "1.0.3", features = [
+    "no-entrypoint"
+] }
