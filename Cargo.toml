@@ -1,7 +1,11 @@
 [package]
 name = "vipers"
 version = "0.1.0"
+description = "Assorted checks and validations for writing safer Solana programs."
+homepage = "https://saber.so"
+repository = "https://github.com/saber-hq/vipers"
 authors = ["Saber Team <team@saber.so>"]
+license = "Apache-2.0"
 edition = "2018"
 
 [dependencies]
