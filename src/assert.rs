@@ -47,7 +47,7 @@ macro_rules! assert_ata {
     };
 }
 
-/// Asserts that two accounts share the same key.
+/// Asserts that the account match the program id.
 #[macro_export]
 macro_rules! assert_program {
     ($account_a: expr, $program_id: tt $(,)?) => {
