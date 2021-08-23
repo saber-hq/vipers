@@ -24,4 +24,6 @@ pub enum VipersError {
     ATAMismatch,
     ProgramIDMismatch,
     IntegerOverflow,
+    #[msg("The provided account is not owned by the specified program.")]
+    OwnerMismatch,
 }
