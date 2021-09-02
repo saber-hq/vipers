@@ -1,5 +1,7 @@
 //! Library for writing safer Solana programs.
 #![deny(missing_docs)]
+#![deny(rustdoc::all)]
+#![allow(rustdoc::missing_doc_code_examples)]
 
 pub mod assert;
 pub mod program_ids;
@@ -33,4 +35,6 @@ pub enum VipersError {
     IntegerOverflow,
     #[msg("The provided account is not owned by the specified program.")]
     OwnerMismatch,
+    #[msg("The provided token account is not an associated token account.")]
+    InvalidATA,
 }
