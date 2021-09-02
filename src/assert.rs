@@ -50,12 +50,13 @@ macro_rules! assert_ata {
 /// Asserts that the given account matches the program id.
 #[macro_export]
 macro_rules! assert_program {
-    ($account: expr, $program_id: tt $(,)?) => {
+    ($account: expr, $program: ident $(,)?) => {
         let __account = anchor_lang::Key::key(&$account);
-        let __program_id: Pubkey = $crate::program_ids::$program_id;
+        let __program_id: Pubkey = $crate::program_ids::$program::ID;
         if __account != __program_id {
             msg!(
-                "Program ID mismatch: expected {}, found {}",
+                "Incorrect program ID for program '{}': expected {}, found {}",
+                stringify!($program),
                 __program_id,
                 __account
             );
@@ -118,7 +119,7 @@ macro_rules! program_err {
     };
 }
 
-/// Require or return a [ProgramError], logging the string representation to the program log.
+/// Require or return a [solana_program::program_error::ProgramError], logging the string representation to the program log.
 #[macro_export]
 macro_rules! prog_require {
     ($invariant:expr, $err:expr $(,)?) => {
@@ -152,7 +153,7 @@ mod tests {
             "ATA"
         );
 
-        assert_program!(token::ID, TOKEN_PROGRAM_ID);
+        assert_program!(token::ID, token);
 
         let weird_math: Option<i32> = (1_i32).checked_add(2);
         let _result = unwrap_int!(weird_math);

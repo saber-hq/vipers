@@ -1,10 +1,17 @@
-use anchor_lang::{prelude::*, solana_program::system_program};
+//! Various program IDs.
 
-/// ID of the SPL token program.
-pub static TOKEN_PROGRAM_ID: Pubkey = anchor_spl::token::ID;
+/// SPL Token program.
+pub mod token {
+    solana_program::declare_id!("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+}
 
-/// ID of the SPL associated token program.
-pub static ASSOCIATED_TOKEN_PROGRAM_ID: Pubkey = spl_associated_token_account::ID;
+/// SPL Associated token program.
+pub mod associated_token {
+    solana_program::declare_id!("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
+}
 
-/// ID of the system program.
-pub static SYSTEM_PROGRAM_ID: Pubkey = system_program::ID;
+/// System program.
+pub mod system {
+    /// System program ID.
+    pub static ID: solana_program::pubkey::Pubkey = solana_program::system_program::ID;
+}
