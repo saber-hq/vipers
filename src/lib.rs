@@ -1,4 +1,7 @@
 //! Library for writing safer Solana programs.
+#![deny(missing_docs)]
+#![deny(rustdoc::all)]
+#![allow(rustdoc::missing_doc_code_examples)]
 
 pub mod assert;
 pub mod program_ids;
@@ -18,12 +21,20 @@ pub fn validate_derived_address(
     }
 }
 
+/// Vipers validation error.
+#[allow(missing_docs)]
 #[error(offset = 1100)]
 pub enum VipersError {
+    #[msg("Keys do not match.")]
     KeyMismatch,
+    #[msg("Associated token account does not match.")]
     ATAMismatch,
+    #[msg("Program ID does not match.")]
     ProgramIDMismatch,
+    #[msg("Integer overflow.")]
     IntegerOverflow,
     #[msg("The provided account is not owned by the specified program.")]
     OwnerMismatch,
+    #[msg("The provided token account is not an associated token account.")]
+    InvalidATA,
 }

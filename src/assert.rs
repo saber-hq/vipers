@@ -47,15 +47,43 @@ macro_rules! assert_ata {
     };
 }
 
+/// Asserts that the given [anchor_spl::token::TokenAccount] is an associated token account.
+#[macro_export]
+macro_rules! assert_is_ata {
+    ($ata: expr $(,)?) => {
+        assert_ata!($ata, "invalid ata")
+    };
+    ($ata: expr, $msg: expr $(,)?) => {
+        assert_owner!($ata, token, "ATA not owned by token program");
+        let __owner = $ata.owner;
+        let __mint = $ata.mint;
+        let __ata = anchor_lang::Key::key(&$ata);
+        let __real_ata =
+            spl_associated_token_account::get_associated_token_address(&__owner, &__mint);
+        if __real_ata != __ata {
+            msg!(
+                "Invalid ATA: {}: {} (left) != {} (right)",
+                $msg,
+                __ata,
+                __real_ata
+            );
+            msg!("Owner: {}", __owner);
+            msg!("Mint: {}", __mint);
+            return Err($crate::VipersError::InvalidATA.into());
+        }
+    };
+}
+
 /// Asserts that the given account matches the program id.
 #[macro_export]
 macro_rules! assert_program {
-    ($account: expr, $program_id: tt $(,)?) => {
+    ($account: expr, $program: ident $(,)?) => {
         let __account = anchor_lang::Key::key(&$account);
-        let __program_id: Pubkey = $crate::program_ids::$program_id;
+        let __program_id: Pubkey = $crate::program_ids::$program::ID;
         if __account != __program_id {
             msg!(
-                "Program ID mismatch: expected {}, found {}",
+                "Incorrect program ID for program '{}': expected {}, found {}",
+                stringify!($program),
                 __program_id,
                 __account
             );
@@ -84,6 +112,13 @@ macro_rules! assert_owner {
             return Err($crate::VipersError::OwnerMismatch.into());
         }
     };
+    ($program_account: expr, $owner: ident $(,)?) => {
+        assert_owner!($program_account, $owner);
+    };
+    ($program_account: expr, $owner: ident, $msg: expr $(,)?) => {
+        let __program_id = $crate::program_ids::$owner::ID;
+        assert_owner!($program_account, $owner, $msg);
+    };
 }
 
 /// Ensures an [Option] can be unwrapped, otherwise returns the error
@@ -95,6 +130,14 @@ macro_rules! unwrap_or_err {
 }
 
 /// Unwraps the result of a checked integer operation.
+///
+/// # Example
+///
+/// ```
+/// let one = 1;
+/// let two = 2;
+/// let my_value = unwrap_int!(one.checked_sub(2)); // returns an error
+/// ```
 #[macro_export]
 macro_rules! unwrap_int {
     ($option:expr $(,)?) => {
@@ -103,6 +146,12 @@ macro_rules! unwrap_int {
 }
 
 /// Tries to unwrap the [Result], otherwise returns the error
+///
+/// # Example
+///
+/// ```
+/// let my_value = try_or_err!(function_returning_result(), MyError);
+/// ```
 #[macro_export]
 macro_rules! try_or_err {
     ($result:expr, $error:tt $(,)?) => {
@@ -111,6 +160,15 @@ macro_rules! try_or_err {
 }
 
 /// Returns the given error as a program error.
+///
+/// # Example
+///
+/// ```
+/// if fail {
+///     return program_err!(MyError);
+/// }
+/// Ok(())
+/// ```
 #[macro_export]
 macro_rules! program_err {
     ($error:tt $(,)?) => {
@@ -118,7 +176,16 @@ macro_rules! program_err {
     };
 }
 
-/// Require or return a [ProgramError], logging the string representation to the program log.
+/// Require or return a [solana_program::program_error::ProgramError], logging the string representation to the program log.
+///
+/// # Example
+///
+/// ```
+/// if fail {
+///     return prog_require!(ProgramError::CustomError(10));
+/// }
+/// Ok(())
+/// ```
 #[macro_export]
 macro_rules! prog_require {
     ($invariant:expr, $err:expr $(,)?) => {
@@ -152,7 +219,7 @@ mod tests {
             "ATA"
         );
 
-        assert_program!(token::ID, TOKEN_PROGRAM_ID);
+        assert_program!(token::ID, token);
 
         let weird_math: Option<i32> = (1_i32).checked_add(2);
         let _result = unwrap_int!(weird_math);
