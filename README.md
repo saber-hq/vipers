@@ -1,9 +1,9 @@
 # vipers 😎
 
-[![Crates.io](https://img.shields.io/crates/v/vipers?style=flat-square)](https://crates.io/crates/vipers)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)](https://github.com/saber-hq/vipers/blob/master/LICENSE-APACHE)
-[![Build Status](https://img.shields.io/github/workflow/status/saber-hq/vipers/Rust/master?style=flat-square)](https://github.com/saber-hq/vipers/actions/workflows/rust.yml?query=branch%3Amaster)
-[![Contributors](https://img.shields.io/github/contributors/saber-hq/vipers?style=flat-square)](https://github.com/saber-hq/vipers/graphs/contributors)
+[![Crates.io](https://img.shields.io/crates/v/vipers)](https://crates.io/crates/vipers)
+[![License](https://img.shields.io/crates/l/vipers)](https://github.com/saber-hq/vipers/blob/master/LICENSE.txt)
+[![Build Status](https://img.shields.io/github/workflow/status/saber-hq/vipers/Rust/master)](https://github.com/saber-hq/vipers/actions/workflows/rust.yml?query=branch%3Amaster)
+[![Contributors](https://img.shields.io/github/contributors/saber-hq/vipers)](https://github.com/saber-hq/vipers/graphs/contributors)
 
 <p align="center">
     <img src="/images/banner.png" />
