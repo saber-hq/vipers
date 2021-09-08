@@ -9,6 +9,8 @@ pub mod validate;
 
 use anchor_lang::prelude::*;
 
+declare_id!("VipersTest111111111111111111111111111111111");
+
 /// Validates a derived program address.
 pub fn validate_derived_address(
     derived_address: &Pubkey,
