@@ -229,24 +229,23 @@ mod tests {
 
     #[test]
     fn test_assert_owner() -> ProgramResult {
-        let key = Pubkey::new_unique();
         let mut lamports: u64 = 8 + (TestData::default().try_to_vec().unwrap().len() as u64);
 
         let mut buffer: [u8; 16] = [0; 16];
         let mut buf: &mut [u8] = &mut buffer;
         TestData::default().try_serialize(&mut buf)?;
 
-        let info: CpiAccount<TestData> = CpiAccount::try_from(&AccountInfo::new(
-            &key,
+        let info: Account<TestData> = Account::try_from(&AccountInfo::new(
+            &crate::ID,
             false,
             false,
             &mut lamports,
             &mut buffer,
-            &key,
+            &crate::ID,
             false,
             0,
         ))?;
-        assert_owner!(info, key);
+        assert_owner!(info, crate::ID);
 
         Ok(())
     }
