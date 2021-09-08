@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  workflow_dispatch: {}
+  push:
+    tags:
+      - "v*.*.*"
+
+env:
+  CARGO_TERM_COLOR: always
+  SOLANA_VERSION: "1.7.11"
+  RUST_TOOLCHAIN: nightly-2021-09-07
+
+jobs:
+  release-crate:
+    runs-on: ubuntu-latest
+    name: Release crate on crates.io
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Rust nightly
+        uses: actions-rs/toolchain@v1
+        with:
+          override: true
+          profile: minimal
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+      - uses: Swatinem/rust-cache@v1
+      - name: Publish crates
+        run: cargo publish --token ${{ secrets.CARGO_PUBLISH_TOKEN }}
+      - name: Release
+        uses: softprops/action-gh-release@v1
