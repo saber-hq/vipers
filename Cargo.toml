@@ -10,7 +10,7 @@ edition = "2018"
 exclude = ["images/"]
 
 [dependencies]
-anchor-lang = "0.15.0"
+anchor-lang = "0.16.1"
 anchor-spl = "0.15.0"
 spl-associated-token-account = { version = "1.0.3", features = [
     "no-entrypoint"
