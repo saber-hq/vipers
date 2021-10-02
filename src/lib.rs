@@ -4,7 +4,6 @@
 #![allow(rustdoc::missing_doc_code_examples)]
 
 pub mod assert;
-pub mod program_ids;
 pub mod validate;
 
 use anchor_lang::prelude::*;

@@ -74,24 +74,6 @@ macro_rules! assert_is_ata {
     };
 }
 
-/// Asserts that the given account matches the program id.
-#[macro_export]
-macro_rules! assert_program {
-    ($account: expr, $program: ident $(,)?) => {
-        let __account = anchor_lang::Key::key(&$account);
-        let __program_id: Pubkey = $crate::program_ids::$program::ID;
-        if __account != __program_id {
-            msg!(
-                "Incorrect program ID for program '{}': expected {}, found {}",
-                stringify!($program),
-                __program_id,
-                __account
-            );
-            return Err($crate::VipersError::ProgramIDMismatch.into());
-        }
-    };
-}
-
 /// Asserts that an account is owned by the given program.
 #[macro_export]
 macro_rules! assert_owner {
@@ -218,8 +200,6 @@ mod tests {
             token::ID,
             "ATA"
         );
-
-        assert_program!(token::ID, token);
 
         let weird_math: Option<i32> = (1_i32).checked_add(2);
         let _result = unwrap_int!(weird_math);
