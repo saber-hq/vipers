@@ -178,6 +178,23 @@ macro_rules! prog_require {
     };
 }
 
+/// Asserts that an invariant holds, otherwise logs the given message.
+///
+/// # Example
+///
+/// ```
+/// invariant!(1 == 2, "incorrect");
+/// ```
+#[macro_export]
+macro_rules! invariant {
+    ($invariant:expr, $err:expr $(,)?) => {
+        if !($invariant) {
+            msg!("Invariant failed: {:?}", $err);
+            return Err($crate::VipersError::IntegerOverflow.into());
+        }
+    };
+}
+
 #[cfg(test)]
 mod tests {
     use anchor_lang::prelude::*;

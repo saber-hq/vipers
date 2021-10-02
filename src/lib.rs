@@ -38,4 +38,6 @@ pub enum VipersError {
     OwnerMismatch,
     #[msg("The provided token account is not an associated token account.")]
     InvalidATA,
+    #[msg("Invariant failed.")]
+    InvariantFailed,
 }
