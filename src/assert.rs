@@ -190,7 +190,7 @@ macro_rules! invariant {
     ($invariant:expr, $err:expr $(,)?) => {
         if !($invariant) {
             msg!("Invariant failed: {:?}", $err);
-            return Err($crate::VipersError::IntegerOverflow.into());
+            return Err($crate::VipersError::InvariantFailed.into());
         }
     };
 }
