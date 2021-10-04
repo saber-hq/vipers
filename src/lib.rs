@@ -40,4 +40,6 @@ pub enum VipersError {
     InvalidATA,
     #[msg("Invariant failed.")]
     InvariantFailed,
+    #[msg("Option unwrap failed.")]
+    OptionUnwrapFailed,
 }

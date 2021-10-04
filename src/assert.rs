@@ -195,6 +195,25 @@ macro_rules! invariant {
     };
 }
 
+/// Attempts to unwrap an [Option], and if it fails, prints an error.
+///
+/// # Example
+///
+/// ```
+/// let one = 1;
+/// let two = 2;
+/// let my_value = unwrap_opt!(one.checked_sub(2), "cannot do this"); // returns an error
+/// ```
+#[macro_export]
+macro_rules! unwrap_opt{
+    ($option:expr, $err:expr $(,)?) => {
+        $option.ok_or_else(|| -> {
+            msg!("Option unwrap failed: {:?}", $err);
+            ProgramError { $crate::VipersError::OptionUnwrapFailed.into() }
+        })?
+    };
+}
+
 #[cfg(test)]
 mod tests {
     use anchor_lang::prelude::*;
