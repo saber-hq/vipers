@@ -115,10 +115,14 @@ macro_rules! unwrap_or_err {
 ///
 /// # Example
 ///
-/// ```
-/// let one = 1;
-/// let two = 2;
+/// ```should_panic
+/// # use anchor_lang::prelude::*;
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// let one = 1_u64;
+/// let two = 2_u64;
 /// let my_value = unwrap_int!(one.checked_sub(2)); // returns an error
+/// Ok(())
+/// # }
 /// ```
 #[macro_export]
 macro_rules! unwrap_int {
@@ -131,8 +135,17 @@ macro_rules! unwrap_int {
 ///
 /// # Example
 ///
-/// ```
+/// ```should_panic
+/// # use anchor_lang::prelude::*;
+/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
+/// # pub enum ErrorCode { MyError }
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// fn function_returning_result() -> Result<u64, u64> {
+///     Err(123)
+/// }
+///
 /// let my_value = try_or_err!(function_returning_result(), MyError);
+/// # Ok(()) }
 /// ```
 #[macro_export]
 macro_rules! try_or_err {
@@ -146,10 +159,16 @@ macro_rules! try_or_err {
 /// # Example
 ///
 /// ```
+/// # use anchor_lang::prelude::*;
+/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
+/// # pub enum ErrorCode { MyError }
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// let fail = false;
 /// if fail {
 ///     return program_err!(MyError);
 /// }
 /// Ok(())
+/// # }
 /// ```
 #[macro_export]
 macro_rules! program_err {
@@ -158,32 +177,15 @@ macro_rules! program_err {
     };
 }
 
-/// Require or return a [solana_program::program_error::ProgramError], logging the string representation to the program log.
-///
-/// # Example
-///
-/// ```
-/// if fail {
-///     return prog_require!(ProgramError::CustomError(10));
-/// }
-/// Ok(())
-/// ```
-#[macro_export]
-macro_rules! prog_require {
-    ($invariant:expr, $err:expr $(,)?) => {
-        if !($invariant) {
-            msg!("Invariant failed: {:?}", $err);
-            return Err($err.into());
-        }
-    };
-}
-
 /// Asserts that an invariant holds, otherwise logs the given message.
 ///
 /// # Example
 ///
-/// ```
+/// ```should_panic
+/// # use anchor_lang::prelude::*;
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
 /// invariant!(1 == 2, "incorrect");
+/// # Ok(()) }
 /// ```
 #[macro_export]
 macro_rules! invariant {
@@ -199,17 +201,20 @@ macro_rules! invariant {
 ///
 /// # Example
 ///
-/// ```
-/// let one = 1;
-/// let two = 2;
+/// ```should_panic
+/// # use anchor_lang::prelude::*;
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// let one = 1_u64;
+/// let two = 2_u64;
 /// let my_value = unwrap_opt!(one.checked_sub(2), "cannot do this"); // returns an error
+/// # Ok(()) }
 /// ```
 #[macro_export]
-macro_rules! unwrap_opt{
+macro_rules! unwrap_opt {
     ($option:expr, $err:expr $(,)?) => {
-        $option.ok_or_else(|| -> {
+        $option.ok_or_else(|| -> ProgramError {
             msg!("Option unwrap failed: {:?}", $err);
-            ProgramError { $crate::VipersError::OptionUnwrapFailed.into() }
+            $crate::VipersError::OptionUnwrapFailed.into()
         })?
     };
 }
@@ -239,6 +244,7 @@ mod tests {
 
         let weird_math: Option<i32> = (1_i32).checked_add(2);
         let _result = unwrap_int!(weird_math);
+        unwrap_opt!(weird_math, "aaa");
 
         Ok(())
     }
