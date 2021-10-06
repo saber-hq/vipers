@@ -53,7 +53,7 @@ jobs:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v1
-      - run: cargo test --lib
+      - run: cargo test
 
   doc:
     runs-on: ubuntu-latest

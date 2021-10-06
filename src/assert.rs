@@ -103,7 +103,21 @@ macro_rules! assert_owner {
     };
 }
 
-/// Ensures an [Option] can be unwrapped, otherwise returns the error
+/// Ensures an [Option] can be unwrapped, otherwise returns the error.
+///
+/// # Example
+///
+/// ```should_panic
+/// # use anchor_lang::prelude::*;
+/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
+/// # pub enum ErrorCode { MyError }
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// let one = 1_u64;
+/// let two = 2_u64;
+/// let my_value = unwrap_or_err!(one.checked_sub(2), MyError); // throws an error
+/// Ok(())
+/// # }
+/// ```
 #[macro_export]
 macro_rules! unwrap_or_err {
     ($option:expr, $error:tt $(,)?) => {
