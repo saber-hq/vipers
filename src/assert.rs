@@ -103,6 +103,112 @@ macro_rules! assert_owner {
     };
 }
 
+/// Asserts that two accounts share the same key.
+///
+/// # Example
+///
+/// ```should_panic
+/// # use anchor_lang::prelude::*;
+/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
+/// # pub enum ErrorCode { MyError }
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// let one = anchor_lang::solana_program::sysvar::clock::ID;
+/// let two = anchor_lang::solana_program::system_program::ID;
+/// assert_keys_eq!(one, two); // throws an error
+/// Ok(())
+/// # }
+/// ```
+///
+/// ```should_panic
+/// # use anchor_lang::prelude::*;
+/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
+/// # pub enum ErrorCode { MyError }
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// let one = anchor_lang::solana_program::sysvar::clock::ID;
+/// let two = anchor_lang::solana_program::system_program::ID;
+/// assert_keys_eq!(one, two, "invalid"); // throws an error
+/// Ok(())
+/// # }
+/// ```
+#[macro_export]
+macro_rules! assert_keys_eq {
+    ($account_a: expr, $account_b: expr $(,)?) => {
+        assert_keys_eq!($account_a, $account_b, $crate::VipersError::KeyMismatch)
+    };
+    ($account_a: expr, $account_b: expr, $err: ident) => {
+        assert_keys_eq!($account_a, $account_b, crate::ErrorCode::$ident)
+    };
+    ($account_a: expr, $account_b: expr, $msg: literal) => {
+        let __account_a = anchor_lang::Key::key(&$account_a);
+        let __account_b = anchor_lang::Key::key(&$account_b);
+        if __account_a != __account_b {
+            msg!(
+                "Key mismatch: {}: {} (left) != {} (right)",
+                $msg,
+                __account_a,
+                __account_b
+            );
+            return Err($crate::VipersError::KeyMismatch.into());
+        }
+    };
+    ($account_a: expr, $account_b: expr, $err: expr $(,)?) => {
+        let __account_a = anchor_lang::Key::key(&$account_a);
+        let __account_b = anchor_lang::Key::key(&$account_b);
+        if __account_a != __account_b {
+            return Err($err.into());
+        }
+    };
+}
+
+/// Asserts that two accounts do not share the same key.
+///
+/// # Example
+///
+/// ```should_panic
+/// # use anchor_lang::prelude::*;
+/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
+/// # pub enum ErrorCode { MyError }
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// let one = Pubkey::default();
+/// let two = Pubkey::default();
+/// assert_keys_neq!(one, two); // throws an error
+/// Ok(())
+/// # }
+/// ```
+#[macro_export]
+macro_rules! assert_keys_neq {
+    ($account_a: expr, $account_b: expr $(,)?) => {
+        assert_keys_neq!(
+            $account_a,
+            $account_b,
+            $crate::VipersError::KeysMustNotMatch
+        )
+    };
+    ($account_a: expr, $account_b: expr, $err: ident) => {
+        assert_keys_neq!($account_a, $account_b, crate::ErrorCode::$ident)
+    };
+    ($account_a: expr, $account_b: expr, $msg: literal) => {
+        let __account_a = anchor_lang::Key::key(&$account_a);
+        let __account_b = anchor_lang::Key::key(&$account_b);
+        if __account_a == __account_b {
+            msg!(
+                "Keys must not match: {}: {} (left) == {} (right)",
+                $msg,
+                __account_a,
+                __account_b
+            );
+            return Err($crate::VipersError::KeysMustNotMatch.into());
+        }
+    };
+    ($account_a: expr, $account_b: expr, $err: expr $(,)?) => {
+        let __account_a = anchor_lang::Key::key(&$account_a);
+        let __account_b = anchor_lang::Key::key(&$account_b);
+        if __account_a == __account_b {
+            return Err($err.into());
+        }
+    };
+}
+
 /// Ensures an [Option] can be unwrapped, otherwise returns the error.
 ///
 /// # Example
