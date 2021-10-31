@@ -42,4 +42,6 @@ pub enum VipersError {
     InvariantFailed,
     #[msg("Option unwrap failed.")]
     OptionUnwrapFailed,
+    #[msg("Keys must not match.")]
+    KeysMustNotMatch,
 }
