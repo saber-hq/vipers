@@ -32,7 +32,7 @@ macro_rules! assert_ata {
         let __mint = anchor_lang::Key::key(&$mint);
         let __ata = anchor_lang::Key::key(&$ata);
         let __real_ata =
-            spl_associated_token_account::get_associated_token_address(&__owner, &__mint);
+            $crate::spl_associated_token_account::get_associated_token_address(&__owner, &__mint);
         if __real_ata != __ata {
             msg!(
                 "ATA mismatch: {}: {} (left) != {} (right)",
@@ -59,7 +59,7 @@ macro_rules! assert_is_ata {
         let __mint = $ata.mint;
         let __ata = anchor_lang::Key::key(&$ata);
         let __real_ata =
-            spl_associated_token_account::get_associated_token_address(&__owner, &__mint);
+            $crate::spl_associated_token_account::get_associated_token_address(&__owner, &__mint);
         if __real_ata != __ata {
             msg!(
                 "Invalid ATA: {}: {} (left) != {} (right)",
@@ -133,28 +133,37 @@ macro_rules! assert_owner {
 #[macro_export]
 macro_rules! assert_keys_eq {
     ($account_a: expr, $account_b: expr $(,)?) => {
-        assert_keys_eq!($account_a, $account_b, $crate::VipersError::KeyMismatch)
+        assert_keys_eq!($account_a, $account_b, $crate::VipersError::KeyMismatch);
     };
-    ($account_a: expr, $account_b: expr, $err: ident) => {
-        assert_keys_eq!($account_a, $account_b, crate::ErrorCode::$ident)
+    ($account_a: expr, $account_b: expr, $err_code: ident $(,)?) => {
+        assert_keys_eq!($account_a, $account_b, crate::ErrorCode::$err_code);
     };
-    ($account_a: expr, $account_b: expr, $msg: literal) => {
-        let __account_a = anchor_lang::Key::key(&$account_a);
-        let __account_b = anchor_lang::Key::key(&$account_b);
-        if __account_a != __account_b {
-            msg!(
-                "Key mismatch: {}: {} (left) != {} (right)",
-                $msg,
-                __account_a,
-                __account_b
-            );
-            return Err($crate::VipersError::KeyMismatch.into());
-        }
+    ($account_a: expr, $account_b: expr, $msg: literal $(,)?) => {
+        assert_keys_eq!(
+            $account_a,
+            $account_b,
+            $crate::VipersError::KeyMismatch,
+            &*format!("Key mismatch: {}", $msg),
+        );
     };
     ($account_a: expr, $account_b: expr, $err: expr $(,)?) => {
-        let __account_a = anchor_lang::Key::key(&$account_a);
-        let __account_b = anchor_lang::Key::key(&$account_b);
+        assert_keys_eq!(
+            $account_a,
+            $account_b,
+            $err,
+            &*format!("{:?}: {}", $err, $err)
+        );
+    };
+    ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {
+        let __account_a = $account_a.key();
+        let __account_b = $account_b.key();
         if __account_a != __account_b {
+            msg!($msg);
+            msg!(stringify!($account_a != $account_b));
+            msg!("Left:");
+            msg!("{}", __account_a);
+            msg!("Right:");
+            msg!("{}", __account_b);
             return Err($err.into());
         }
     };
@@ -182,28 +191,37 @@ macro_rules! assert_keys_neq {
             $account_a,
             $account_b,
             $crate::VipersError::KeysMustNotMatch
-        )
+        );
     };
-    ($account_a: expr, $account_b: expr, $err: ident) => {
-        assert_keys_neq!($account_a, $account_b, crate::ErrorCode::$ident)
+    ($account_a: expr, $account_b: expr, $err_code: ident $(,)?) => {
+        assert_keys_neq!($account_a, $account_b, crate::ErrorCode::$err_code);
     };
-    ($account_a: expr, $account_b: expr, $msg: literal) => {
-        let __account_a = anchor_lang::Key::key(&$account_a);
-        let __account_b = anchor_lang::Key::key(&$account_b);
-        if __account_a == __account_b {
-            msg!(
-                "Keys must not match: {}: {} (left) == {} (right)",
-                $msg,
-                __account_a,
-                __account_b
-            );
-            return Err($crate::VipersError::KeysMustNotMatch.into());
-        }
+    ($account_a: expr, $account_b: expr, $msg: literal $(,)?) => {
+        assert_keys_neq!(
+            $account_a,
+            $account_b,
+            $crate::VipersError::KeysMustNotMatch,
+            &*format!("Keys must not match: {}", $msg),
+        );
     };
     ($account_a: expr, $account_b: expr, $err: expr $(,)?) => {
-        let __account_a = anchor_lang::Key::key(&$account_a);
-        let __account_b = anchor_lang::Key::key(&$account_b);
+        assert_keys_neq!(
+            $account_a,
+            $account_b,
+            $err,
+            &*format!("{:?}: {}", $err, $err)
+        );
+    };
+    ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {
+        let __account_a = $account_a.key();
+        let __account_b = $account_b.key();
         if __account_a == __account_b {
+            msg!($msg);
+            msg!(stringify!($account_a == $account_b));
+            msg!("Left:");
+            msg!("{}", __account_a);
+            msg!("Right:");
+            msg!("{}", __account_b);
             return Err($err.into());
         }
     };
