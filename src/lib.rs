@@ -9,6 +9,8 @@ pub mod validate;
 use anchor_lang::prelude::*;
 pub use spl_associated_token_account;
 
+pub use validate::Validate;
+
 declare_id!("VipersTest111111111111111111111111111111111");
 
 /// Validates a derived program address.
