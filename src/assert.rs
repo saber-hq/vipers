@@ -43,6 +43,9 @@ macro_rules! assert_ata {
 }
 
 /// Asserts that the given [anchor_spl::token::TokenAccount] is an associated token account.
+///
+/// Warning: this uses a lot of compute units due to the need to generate a PDA.
+/// Use this macro sparingly.
 #[macro_export]
 macro_rules! assert_is_ata {
     ($ata: expr $(,)?) => {
@@ -331,8 +334,16 @@ macro_rules! throw_err {
         throw_err!(crate::ErrorCode::$error);
     };
     ($error:expr $(,)?) => {
-        msg!("Error thrown at {}:{}", file!(), line!());
+        log_code_location!();
         return Err($error.into());
+    };
+}
+
+/// Logs where in the code the macro was invoked.
+#[macro_export]
+macro_rules! log_code_location {
+    () => {
+        msg!("Error thrown at {}:{}", file!(), line!());
     };
 }
 
@@ -351,7 +362,7 @@ macro_rules! invariant {
     ($invariant:expr, $err:expr $(,)?) => {
         if !($invariant) {
             msg!("Invariant failed: {:?}", $err);
-            return Err($crate::VipersError::InvariantFailed.into());
+            throw_err!($crate::VipersError::InvariantFailed);
         }
     };
 }
@@ -373,6 +384,7 @@ macro_rules! unwrap_opt {
     ($option:expr, $err:expr $(,)?) => {
         $option.ok_or_else(|| -> ProgramError {
             msg!("Option unwrap failed: {:?}", $err);
+            log_code_location!();
             $crate::VipersError::OptionUnwrapFailed.into()
         })?
     };
