@@ -160,7 +160,7 @@ macro_rules! assert_keys_eq {
             msg!(stringify!($account_a != $account_b));
             msg!("Left: {}", __account_a);
             msg!("Right: {}", __account_b);
-            return Err($err.into());
+            throw_err!($err);
         }
     };
 }
@@ -216,7 +216,7 @@ macro_rules! assert_keys_neq {
             msg!(stringify!($account_a == $account_b));
             msg!("Left: {}", __account_a);
             msg!("Right: {}", __account_b);
-            return Err($err.into());
+            throw_err!($err);
         }
     };
 }
@@ -306,6 +306,33 @@ macro_rules! try_or_err {
 macro_rules! program_err {
     ($error:tt $(,)?) => {
         Err(crate::ErrorCode::$error.into())
+    };
+}
+
+/// Throws an error.
+///
+/// # Example
+///
+/// ```
+/// # use anchor_lang::prelude::*;
+/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
+/// # pub enum ErrorCode { MyError }
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// let fail = false;
+/// if fail {
+///     throw_err!(MyError);
+/// }
+/// Ok(())
+/// # }
+/// ```
+#[macro_export]
+macro_rules! throw_err {
+    ($error:ident $(,)?) => {
+        throw_err!(crate::ErrorCode::$error);
+    };
+    ($error:expr $(,)?) => {
+        msg!("Error thrown at {}:{}", file!(), line!());
+        return Err($error.into());
     };
 }
 
