@@ -58,7 +58,7 @@ macro_rules! log_code_location {
 #[macro_export]
 macro_rules! throw_err {
     ($error:ident $(,)?) => {
-        throw_err!(crate::ErrorCode::$error);
+        $crate::throw_err!(crate::ErrorCode::$error);
     };
     ($error:expr $(,)?) => {
         $crate::log_code_location!();
@@ -101,10 +101,10 @@ macro_rules! assert_ata {
 #[macro_export]
 macro_rules! assert_is_ata {
     ($ata: expr $(,)?) => {
-        assert_ata!($ata, "invalid ata")
+        $crate::assert_ata!($ata, "invalid ata")
     };
     ($ata: expr, $msg: expr $(,)?) => {
-        assert_owner!($ata, token, "ATA not owned by token program");
+        $crate::assert_owner!($ata, token, "ATA not owned by token program");
         let __owner = $ata.owner;
         let __mint = $ata.mint;
         let __ata = anchor_lang::Key::key(&$ata);
@@ -131,7 +131,7 @@ macro_rules! assert_is_ata {
 #[macro_export]
 macro_rules! assert_owner {
     ($program_account: expr, $owner: expr $(,)?) => {
-        assert_owner!($program_account, $owner, "owner mismatch")
+        $crate::assert_owner!($program_account, $owner, "owner mismatch")
     };
     ($program_account: expr, $owner: expr, $msg: expr $(,)?) => {
         let __program_account =
@@ -148,11 +148,11 @@ macro_rules! assert_owner {
         }
     };
     ($program_account: expr, $owner: ident $(,)?) => {
-        assert_owner!($program_account, $owner);
+        $crate::assert_owner!($program_account, $owner);
     };
     ($program_account: expr, $owner: ident, $msg: expr $(,)?) => {
         let __program_id = $crate::program_ids::$owner::ID;
-        assert_owner!($program_account, $owner, $msg);
+        $crate::assert_owner!($program_account, $owner, $msg);
     };
 }
 
@@ -186,13 +186,13 @@ macro_rules! assert_owner {
 #[macro_export]
 macro_rules! assert_keys_eq {
     ($account_a: expr, $account_b: expr $(,)?) => {
-        assert_keys_eq!($account_a, $account_b, $crate::VipersError::KeyMismatch);
+        $crate::assert_keys_eq!($account_a, $account_b, $crate::VipersError::KeyMismatch);
     };
     ($account_a: expr, $account_b: expr, $err_code: ident $(,)?) => {
-        assert_keys_eq!($account_a, $account_b, crate::ErrorCode::$err_code);
+        $crate::assert_keys_eq!($account_a, $account_b, crate::ErrorCode::$err_code);
     };
     ($account_a: expr, $account_b: expr, $msg: literal $(,)?) => {
-        assert_keys_eq!(
+        $crate::assert_keys_eq!(
             $account_a,
             $account_b,
             $crate::VipersError::KeyMismatch,
@@ -200,7 +200,7 @@ macro_rules! assert_keys_eq {
         );
     };
     ($account_a: expr, $account_b: expr, $err: expr $(,)?) => {
-        assert_keys_eq!($account_a, $account_b, $err, $crate::format_err!($err));
+        $crate::assert_keys_eq!($account_a, $account_b, $err, $crate::format_err!($err));
     };
     ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {
         let __account_a = $account_a.key();
@@ -233,17 +233,17 @@ macro_rules! assert_keys_eq {
 #[macro_export]
 macro_rules! assert_keys_neq {
     ($account_a: expr, $account_b: expr $(,)?) => {
-        assert_keys_neq!(
+        $crate::assert_keys_neq!(
             $account_a,
             $account_b,
             $crate::VipersError::KeysMustNotMatch
         );
     };
     ($account_a: expr, $account_b: expr, $err_code: ident $(,)?) => {
-        assert_keys_neq!($account_a, $account_b, crate::ErrorCode::$err_code);
+        $crate::assert_keys_neq!($account_a, $account_b, crate::ErrorCode::$err_code);
     };
     ($account_a: expr, $account_b: expr, $msg: literal $(,)?) => {
-        assert_keys_neq!(
+        $crate::assert_keys_neq!(
             $account_a,
             $account_b,
             $crate::VipersError::KeysMustNotMatch,
@@ -251,7 +251,7 @@ macro_rules! assert_keys_neq {
         );
     };
     ($account_a: expr, $account_b: expr, $err: expr $(,)?) => {
-        assert_keys_neq!($account_a, $account_b, $err, $crate::format_err!($err));
+        $crate::assert_keys_neq!($account_a, $account_b, $err, $crate::format_err!($err));
     };
     ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {
         let __account_a = $account_a.key();
@@ -345,13 +345,13 @@ macro_rules! try_or_err {
 #[macro_export]
 macro_rules! invariant {
     ($invariant: expr, $err_code: ident $(,)?) => {
-        invariant!($invariant, crate::ErrorCode::$err_code);
+        $crate::invariant!($invariant, crate::ErrorCode::$err_code);
     };
     ($invariant: expr, $msg: literal $(,)?) => {
-        invariant!($invariant, $crate::VipersError::InvariantFailed, $msg);
+        $crate::invariant!($invariant, $crate::VipersError::InvariantFailed, $msg);
     };
     ($invariant:expr, $err:expr $(,)?) => {
-        invariant!($invariant, $err, $crate::format_err!($err));
+        $crate::invariant!($invariant, $err, $crate::format_err!($err));
     };
     ($invariant:expr, $err:expr, $msg: expr $(,)?) => {
         if !($invariant) {
@@ -376,13 +376,13 @@ macro_rules! invariant {
 #[macro_export]
 macro_rules! unwrap_opt {
     ($option: expr, $err_code: ident $(,)?) => {
-        unwrap_opt!($option, crate::ErrorCode::$err_code)
+        $crate::unwrap_opt!($option, crate::ErrorCode::$err_code)
     };
     ($option: expr, $msg: literal $(,)?) => {
-        unwrap_opt!($option, $crate::VipersError::OptionUnwrapFailed, $msg)
+        $crate::unwrap_opt!($option, $crate::VipersError::OptionUnwrapFailed, $msg)
     };
     ($option:expr, $err:expr $(,)?) => {
-        unwrap_opt!($option, $err, $crate::format_err!($err))
+        $crate::unwrap_opt!($option, $err, $crate::format_err!($err))
     };
     ($option:expr, $err:expr, $msg: expr $(,)?) => {
         $option.ok_or_else(|| -> ProgramError {
