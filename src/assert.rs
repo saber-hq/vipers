@@ -148,12 +148,7 @@ macro_rules! assert_keys_eq {
         );
     };
     ($account_a: expr, $account_b: expr, $err: expr $(,)?) => {
-        assert_keys_eq!(
-            $account_a,
-            $account_b,
-            $err,
-            &*format!("{:?}: {}", $err, $err)
-        );
+        assert_keys_eq!($account_a, $account_b, $err, format_err!($err));
     };
     ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {
         let __account_a = $account_a.key();
@@ -204,12 +199,7 @@ macro_rules! assert_keys_neq {
         );
     };
     ($account_a: expr, $account_b: expr, $err: expr $(,)?) => {
-        assert_keys_neq!(
-            $account_a,
-            $account_b,
-            $err,
-            &*format!("{:?}: {}", $err, $err)
-        );
+        assert_keys_neq!($account_a, $account_b, $err, format_err!($err));
     };
     ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {
         let __account_a = $account_a.key();
@@ -262,7 +252,7 @@ macro_rules! unwrap_or_err {
 #[macro_export]
 macro_rules! unwrap_int {
     ($option:expr $(,)?) => {
-        $option.ok_or_else(|| -> ProgramError { $crate::VipersError::IntegerOverflow.into() })?
+        unwrap_opt!($option, $crate::VipersError::IntegerOverflow)
     };
 }
 
@@ -399,7 +389,16 @@ macro_rules! format_err {
 /// ```
 #[macro_export]
 macro_rules! unwrap_opt {
+    ($option: expr, $err_code: ident $(,)?) => {
+        unwrap_opt!($option, crate::ErrorCode::$err_code)
+    };
+    ($option: expr, $msg: literal $(,)?) => {
+        unwrap_opt!($option, $crate::VipersError::OptionUnwrapFailed, $msg)
+    };
     ($option:expr, $err:expr $(,)?) => {
+        unwrap_opt!($option, $err, format_err!($err))
+    };
+    ($option:expr, $err:expr, $msg: expr $(,)?) => {
         $option.ok_or_else(|| -> ProgramError {
             msg!("Option unwrap failed: {:?}", $err);
             log_code_location!();
