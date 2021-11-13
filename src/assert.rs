@@ -7,10 +7,10 @@
 #[macro_export]
 macro_rules! assert_keys {
     ($account_a: expr, $account_b: expr $(,)?) => {
-        assert_keys_eq!($account_a, $account_b, "key mismatch")
+        $crate::assert_keys_eq!($account_a, $account_b, "key mismatch")
     };
     ($account_a: expr, $account_b: expr, $msg: expr $(,)?) => {
-        assert_keys_eq!($account_a, $account_b, $msg)
+        $crate::assert_keys_eq!($account_a, $account_b, $msg)
     };
 }
 
@@ -158,7 +158,7 @@ macro_rules! assert_keys_eq {
             msg!(stringify!($account_a != $account_b));
             msg!("Left: {}", __account_a);
             msg!("Right: {}", __account_b);
-            throw_err!($err);
+            $crate::throw_err!($err);
         }
     };
 }
@@ -209,7 +209,7 @@ macro_rules! assert_keys_neq {
             msg!(stringify!($account_a == $account_b));
             msg!("Left: {}", __account_a);
             msg!("Right: {}", __account_b);
-            throw_err!($err);
+            $crate::throw_err!($err);
         }
     };
 }
@@ -324,7 +324,7 @@ macro_rules! throw_err {
         throw_err!(crate::ErrorCode::$error);
     };
     ($error:expr $(,)?) => {
-        log_code_location!();
+        $crate::log_code_location!();
         return Err($error.into());
     };
 }
@@ -401,7 +401,7 @@ macro_rules! unwrap_opt {
     ($option:expr, $err:expr, $msg: expr $(,)?) => {
         $option.ok_or_else(|| -> ProgramError {
             msg!("Option unwrap failed: {:?}", $err);
-            log_code_location!();
+            $crate::log_code_location!();
             $crate::VipersError::OptionUnwrapFailed.into()
         })?
     };
