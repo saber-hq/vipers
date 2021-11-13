@@ -348,6 +348,7 @@ macro_rules! log_code_location {
 }
 
 /// Asserts that an invariant holds, otherwise logs the given message.
+/// This is a drop-in replacement for `require!`.
 ///
 /// # Example
 ///
@@ -359,11 +360,28 @@ macro_rules! log_code_location {
 /// ```
 #[macro_export]
 macro_rules! invariant {
+    ($invariant: expr, $err_code: ident $(,)?) => {
+        invariant!($invariant, crate::ErrorCode::$err_code);
+    };
+    ($invariant: expr, $msg: literal $(,)?) => {
+        invariant!($invariant, $crate::VipersError::InvariantFailed, $msg);
+    };
     ($invariant:expr, $err:expr $(,)?) => {
+        invariant!($invariant, $err, format_err!($err));
+    };
+    ($invariant:expr, $err:expr, $msg: expr $(,)?) => {
         if !($invariant) {
             msg!("Invariant failed: {:?}", $err);
             throw_err!($crate::VipersError::InvariantFailed);
         }
+    };
+}
+
+/// Formats an error as a `&str`.
+#[macro_export]
+macro_rules! format_err {
+    ($err: expr) => {
+        &*format!("{:?}: {}", $err, $err)
     };
 }
 
