@@ -1,16 +1,68 @@
 //! Various assertions.
 
-/// Asserts that two accounts share the same key.
-///
-/// Deprecated in favor of [assert_keys_eq].
-#[deprecated]
+/// Formats an error as a `&str`.
 #[macro_export]
-macro_rules! assert_keys {
-    ($account_a: expr, $account_b: expr $(,)?) => {
-        $crate::assert_keys_eq!($account_a, $account_b, "key mismatch")
+macro_rules! format_err {
+    ($err: expr) => {
+        &*format!("{:?}: {}", $err, $err)
     };
-    ($account_a: expr, $account_b: expr, $msg: expr $(,)?) => {
-        $crate::assert_keys_eq!($account_a, $account_b, $msg)
+}
+
+/// Returns the given error as a program error.
+///
+/// # Example
+///
+/// ```
+/// # use anchor_lang::prelude::*;
+/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
+/// # pub enum ErrorCode { MyError }
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// let fail = false;
+/// if fail {
+///     return program_err!(MyError);
+/// }
+/// Ok(())
+/// # }
+/// ```
+#[macro_export]
+macro_rules! program_err {
+    ($error:tt $(,)?) => {
+        Err(crate::ErrorCode::$error.into())
+    };
+}
+
+/// Logs where in the code the macro was invoked.
+#[macro_export]
+macro_rules! log_code_location {
+    () => {
+        msg!("Error thrown at {}:{}", file!(), line!());
+    };
+}
+
+/// Throws an error.
+///
+/// # Example
+///
+/// ```
+/// # use anchor_lang::prelude::*;
+/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
+/// # pub enum ErrorCode { MyError }
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// let fail = false;
+/// if fail {
+///     throw_err!(MyError);
+/// }
+/// Ok(())
+/// # }
+/// ```
+#[macro_export]
+macro_rules! throw_err {
+    ($error:ident $(,)?) => {
+        throw_err!(crate::ErrorCode::$error);
+    };
+    ($error:expr $(,)?) => {
+        $crate::log_code_location!();
+        return Err($error.into());
     };
 }
 
@@ -148,7 +200,7 @@ macro_rules! assert_keys_eq {
         );
     };
     ($account_a: expr, $account_b: expr, $err: expr $(,)?) => {
-        assert_keys_eq!($account_a, $account_b, $err, format_err!($err));
+        assert_keys_eq!($account_a, $account_b, $err, $crate::format_err!($err));
     };
     ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {
         let __account_a = $account_a.key();
@@ -199,7 +251,7 @@ macro_rules! assert_keys_neq {
         );
     };
     ($account_a: expr, $account_b: expr, $err: expr $(,)?) => {
-        assert_keys_neq!($account_a, $account_b, $err, format_err!($err));
+        assert_keys_neq!($account_a, $account_b, $err, $crate::format_err!($err));
     };
     ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {
         let __account_a = $account_a.key();
@@ -252,7 +304,7 @@ macro_rules! unwrap_or_err {
 #[macro_export]
 macro_rules! unwrap_int {
     ($option:expr $(,)?) => {
-        unwrap_opt!($option, $crate::VipersError::IntegerOverflow)
+        $crate::unwrap_opt!($option, $crate::VipersError::IntegerOverflow)
     };
 }
 
@@ -279,64 +331,6 @@ macro_rules! try_or_err {
     };
 }
 
-/// Returns the given error as a program error.
-///
-/// # Example
-///
-/// ```
-/// # use anchor_lang::prelude::*;
-/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
-/// # pub enum ErrorCode { MyError }
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
-/// let fail = false;
-/// if fail {
-///     return program_err!(MyError);
-/// }
-/// Ok(())
-/// # }
-/// ```
-#[macro_export]
-macro_rules! program_err {
-    ($error:tt $(,)?) => {
-        Err(crate::ErrorCode::$error.into())
-    };
-}
-
-/// Throws an error.
-///
-/// # Example
-///
-/// ```
-/// # use anchor_lang::prelude::*;
-/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
-/// # pub enum ErrorCode { MyError }
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
-/// let fail = false;
-/// if fail {
-///     throw_err!(MyError);
-/// }
-/// Ok(())
-/// # }
-/// ```
-#[macro_export]
-macro_rules! throw_err {
-    ($error:ident $(,)?) => {
-        throw_err!(crate::ErrorCode::$error);
-    };
-    ($error:expr $(,)?) => {
-        $crate::log_code_location!();
-        return Err($error.into());
-    };
-}
-
-/// Logs where in the code the macro was invoked.
-#[macro_export]
-macro_rules! log_code_location {
-    () => {
-        msg!("Error thrown at {}:{}", file!(), line!());
-    };
-}
-
 /// Asserts that an invariant holds, otherwise logs the given message.
 /// This is a drop-in replacement for `require!`.
 ///
@@ -357,21 +351,13 @@ macro_rules! invariant {
         invariant!($invariant, $crate::VipersError::InvariantFailed, $msg);
     };
     ($invariant:expr, $err:expr $(,)?) => {
-        invariant!($invariant, $err, format_err!($err));
+        invariant!($invariant, $err, $crate::format_err!($err));
     };
     ($invariant:expr, $err:expr, $msg: expr $(,)?) => {
         if !($invariant) {
             msg!("Invariant failed: {:?}", $err);
-            throw_err!($crate::VipersError::InvariantFailed);
+            $crate::throw_err!($crate::VipersError::InvariantFailed);
         }
-    };
-}
-
-/// Formats an error as a `&str`.
-#[macro_export]
-macro_rules! format_err {
-    ($err: expr) => {
-        &*format!("{:?}: {}", $err, $err)
     };
 }
 
@@ -396,7 +382,7 @@ macro_rules! unwrap_opt {
         unwrap_opt!($option, $crate::VipersError::OptionUnwrapFailed, $msg)
     };
     ($option:expr, $err:expr $(,)?) => {
-        unwrap_opt!($option, $err, format_err!($err))
+        unwrap_opt!($option, $err, $crate::format_err!($err))
     };
     ($option:expr, $err:expr, $msg: expr $(,)?) => {
         $option.ok_or_else(|| -> ProgramError {
@@ -404,6 +390,20 @@ macro_rules! unwrap_opt {
             $crate::log_code_location!();
             $crate::VipersError::OptionUnwrapFailed.into()
         })?
+    };
+}
+
+/// Asserts that two accounts share the same key.
+///
+/// Deprecated in favor of [assert_keys_eq].
+#[deprecated]
+#[macro_export]
+macro_rules! assert_keys {
+    ($account_a: expr, $account_b: expr $(,)?) => {
+        $crate::assert_keys_eq!($account_a, $account_b, "key mismatch")
+    };
+    ($account_a: expr, $account_b: expr, $msg: expr $(,)?) => {
+        $crate::assert_keys_eq!($account_a, $account_b, $msg)
     };
 }
 
