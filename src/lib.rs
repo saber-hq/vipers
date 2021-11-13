@@ -7,7 +7,7 @@ pub mod assert;
 pub mod validate;
 
 use anchor_lang::prelude::*;
-pub use spl_associated_token_account;
+pub use spl_associated_token_account as ata;
 
 pub use validate::Validate;
 

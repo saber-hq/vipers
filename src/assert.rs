@@ -1,27 +1,23 @@
 //! Various assertions.
 
 /// Asserts that two accounts share the same key.
+///
+/// Deprecated in favor of [assert_keys_eq].
+#[deprecated]
 #[macro_export]
 macro_rules! assert_keys {
     ($account_a: expr, $account_b: expr $(,)?) => {
-        assert_keys!($account_a, $account_b, "key mismatch")
+        assert_keys_eq!($account_a, $account_b, "key mismatch")
     };
     ($account_a: expr, $account_b: expr, $msg: expr $(,)?) => {
-        let __account_a = anchor_lang::Key::key(&$account_a);
-        let __account_b = anchor_lang::Key::key(&$account_b);
-        if __account_a != __account_b {
-            msg!(
-                "Key mismatch: {}: {} (left) != {} (right)",
-                $msg,
-                __account_a,
-                __account_b
-            );
-            return Err($crate::VipersError::KeyMismatch.into());
-        }
+        assert_keys_eq!($account_a, $account_b, $msg)
     };
 }
 
 /// Asserts that the ATA is the one of the given owner/mint.
+///
+/// Warning: this uses a lot of compute units due to the need to generate a PDA.
+/// It is recommended to cache this value.
 #[macro_export]
 macro_rules! assert_ata {
     ($ata: expr, $owner: expr, $mint: expr $(,)?) => {
@@ -31,8 +27,7 @@ macro_rules! assert_ata {
         let __owner = anchor_lang::Key::key(&$owner);
         let __mint = anchor_lang::Key::key(&$mint);
         let __ata = anchor_lang::Key::key(&$ata);
-        let __real_ata =
-            $crate::spl_associated_token_account::get_associated_token_address(&__owner, &__mint);
+        let __real_ata = $crate::ata::get_associated_token_address(&__owner, &__mint);
         if __real_ata != __ata {
             msg!(
                 "ATA mismatch: {}: {} (left) != {} (right)",
@@ -75,6 +70,9 @@ macro_rules! assert_is_ata {
 }
 
 /// Asserts that an account is owned by the given program.
+///
+/// As of Anchor 0.15, Anchor handles this for you automatically.
+/// You should not need to use this.
 #[macro_export]
 macro_rules! assert_owner {
     ($program_account: expr, $owner: expr $(,)?) => {
@@ -160,10 +158,8 @@ macro_rules! assert_keys_eq {
         if __account_a != __account_b {
             msg!($msg);
             msg!(stringify!($account_a != $account_b));
-            msg!("Left:");
-            msg!("{}", __account_a);
-            msg!("Right:");
-            msg!("{}", __account_b);
+            msg!("Left: {}", __account_a);
+            msg!("Right: {}", __account_b);
             return Err($err.into());
         }
     };
@@ -218,10 +214,8 @@ macro_rules! assert_keys_neq {
         if __account_a == __account_b {
             msg!($msg);
             msg!(stringify!($account_a == $account_b));
-            msg!("Left:");
-            msg!("{}", __account_a);
-            msg!("Right:");
-            msg!("{}", __account_b);
+            msg!("Left: {}", __account_a);
+            msg!("Right: {}", __account_b);
             return Err($err.into());
         }
     };
@@ -369,10 +363,16 @@ mod tests {
         pub byte: u8,
     }
 
+    #[allow(deprecated)]
     #[test]
-    fn test_compiles() -> ProgramResult {
+    fn test_compiles_deprecated() -> ProgramResult {
         assert_keys!(token::ID, token::ID, "token program");
 
+        Ok(())
+    }
+
+    #[test]
+    fn test_compiles() -> ProgramResult {
         assert_ata!(
             get_associated_token_address(&token::ID, &token::ID),
             token::ID,
