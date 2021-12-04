@@ -355,7 +355,8 @@ macro_rules! invariant {
     };
     ($invariant:expr, $err:expr, $msg: expr $(,)?) => {
         if !($invariant) {
-            msg!("Invariant failed: {:?}", $err);
+            msg!($msg);
+            msg!(stringify!($err));
             $crate::throw_err!($crate::VipersError::InvariantFailed);
         }
     };
