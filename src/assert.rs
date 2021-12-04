@@ -351,7 +351,11 @@ macro_rules! invariant {
         $crate::invariant!($invariant, crate::ErrorCode::$err_code);
     };
     ($invariant: expr, $msg: literal $(,)?) => {
-        $crate::invariant!($invariant, $crate::VipersError::InvariantFailed, $msg);
+        $crate::invariant!(
+            $invariant,
+            $crate::VipersError::InvariantFailed,
+            &*format!("Invariant failed: {}", $msg)
+        );
     };
     ($invariant:expr, $err:expr $(,)?) => {
         $crate::invariant!($invariant, $err, $crate::format_err!($err));
@@ -359,8 +363,8 @@ macro_rules! invariant {
     ($invariant:expr, $err:expr, $msg: expr $(,)?) => {
         if !($invariant) {
             msg!($msg);
-            msg!(stringify!($err));
-            $crate::throw_err!($crate::VipersError::InvariantFailed);
+            msg!(stringify!($invariant));
+            $crate::throw_err!($err);
         }
     };
 }
