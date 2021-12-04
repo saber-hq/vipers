@@ -344,6 +344,9 @@ macro_rules! try_or_err {
 /// ```
 #[macro_export]
 macro_rules! invariant {
+    ($invariant: expr $(,)?) => {
+        $crate::invariant!($invariant, $crate::VipersError::InvariantFailed);
+    };
     ($invariant: expr, $err_code: ident $(,)?) => {
         $crate::invariant!($invariant, crate::ErrorCode::$err_code);
     };
