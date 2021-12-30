@@ -8,14 +8,14 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  RUST_TOOLCHAIN: nightly-2021-08-01
+  RUST_TOOLCHAIN: "1.57.0"
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Rust nightly
+      - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
           override: true

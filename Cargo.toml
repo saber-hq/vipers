@@ -1,17 +1,2 @@
-[package]
-name = "vipers"
-version = "1.5.5"
-description = "Assorted checks and validations for writing safer Solana programs."
-homepage = "https://saber.so"
-repository = "https://github.com/saber-hq/vipers"
-authors = ["Saber Team <team@saber.so>"]
-license = "Apache-2.0"
-edition = "2021"
-exclude = ["images/"]
-
-[dependencies]
-anchor-lang = ">=0.17.0"
-anchor-spl = ">=0.17.0"
-spl-associated-token-account = { version = "^1.0.3", features = [
-    "no-entrypoint"
-] }
+[workspace]
+members = ["vipers/"]
