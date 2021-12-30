@@ -1,6 +1,6 @@
 //! Various assertions.
 
-/// Tests a block.
+/// Runs a block, returning a ProgramResult.
 #[macro_export]
 macro_rules! test_assertion {
     ($body: block) => {
@@ -32,6 +32,21 @@ macro_rules! assert_throws {
 }
 
 /// Formats an error as a `&str`.
+///
+/// # Example
+///
+/// ```
+/// # use anchor_lang::prelude::*;
+/// #[error]
+/// pub enum ErrorCode {
+///   #[msg("This is my error")]
+///   MyError
+/// }
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// assert_eq!(format_err!(ErrorCode::MyError), "MyError: This is my error");
+/// # Ok(())
+/// # }
+/// ```
 #[macro_export]
 macro_rules! format_err {
     ($err: expr) => {
@@ -45,14 +60,14 @@ macro_rules! format_err {
 ///
 /// ```
 /// # use anchor_lang::prelude::*;
-/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
+/// # #[error]
 /// # pub enum ErrorCode { MyError }
 /// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
 /// let fail = false;
 /// if fail {
 ///     return program_err!(MyError);
 /// }
-/// Ok(())
+/// # Ok(())
 /// # }
 /// ```
 #[macro_export]
@@ -406,6 +421,9 @@ macro_rules! try_or_err {
 /// });
 /// assert_throws!({
 ///   invariant!(1 == 2);
+/// }, vipers::VipersError::InvariantFailed);
+/// assert_throws!({
+///   invariant!(1 == 2, "this is stupid");
 /// }, vipers::VipersError::InvariantFailed);
 /// assert_throws!({
 ///   invariant!(1 == 2, MyError);
