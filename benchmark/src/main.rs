@@ -69,10 +69,10 @@ fn main() -> Result<()> {
             &program.id(),
         ))
         .signer(&dummy_kp)
-        .accounts(compute_units::accounts::TestComputeUnits {
+        .accounts(compute_units::accounts::BenchAssertKeysEq {
             dummy_a: dummy_kp.pubkey(),
         })
-        .args(compute_units::instruction::TestComputeUnits {
+        .args(compute_units::instruction::BenchAssertKeysEq {
             expected_dummy_a: dummy_kp.pubkey(),
         })
         .send()
