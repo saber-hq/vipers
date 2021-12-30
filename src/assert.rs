@@ -1,5 +1,36 @@
 //! Various assertions.
 
+/// Tests a block.
+#[macro_export]
+macro_rules! test_assertion {
+    ($body: block) => {
+        (|| -> ProgramResult {
+            $body
+            Ok(())
+        })()
+    };
+}
+
+/// Asserts that the given assertion block does not throw any errors.
+///
+/// Recommended for use in tests only.
+#[macro_export]
+macro_rules! assert_does_not_throw {
+    ($body: block $(,)?) => {
+        assert_eq!(test_assertion!($body), Ok(()))
+    };
+}
+
+/// Asserts that the given assertion block throws a specific error.
+///
+/// Recommended for use in tests only.
+#[macro_export]
+macro_rules! assert_throws {
+    ($body: block, $right: expr $(,)?) => {
+        assert_eq!(test_assertion!($body), Err($right.into()))
+    };
+}
+
 /// Formats an error as a `&str`.
 #[macro_export]
 macro_rules! format_err {
@@ -75,7 +106,7 @@ macro_rules! assert_ata {
     ($ata: expr, $owner: expr, $mint: expr $(,)?) => {
         assert_ata!($ata, $owner, $mint, "ata mismatch")
     };
-    ($ata: expr, $owner: expr, $mint: expr, $msg: expr $(,)?) => {
+    ($ata: expr, $owner: expr, $mint: expr, $msg: expr $(,)?) => {{
         let __owner = anchor_lang::Key::key(&$owner);
         let __mint = anchor_lang::Key::key(&$mint);
         let __ata = anchor_lang::Key::key(&$ata);
@@ -91,7 +122,7 @@ macro_rules! assert_ata {
             msg!("Mint: {}", __mint);
             return Err($crate::VipersError::ATAMismatch.into());
         }
-    };
+    }};
 }
 
 /// Asserts that the given [anchor_spl::token::TokenAccount] is an associated token account.
@@ -103,7 +134,7 @@ macro_rules! assert_is_ata {
     ($ata: expr $(,)?) => {
         $crate::assert_ata!($ata, "invalid ata")
     };
-    ($ata: expr, $msg: expr $(,)?) => {
+    ($ata: expr, $msg: expr $(,)?) => {{
         $crate::assert_owner!($ata, token, "ATA not owned by token program");
         let __owner = $ata.owner;
         let __mint = $ata.mint;
@@ -121,7 +152,7 @@ macro_rules! assert_is_ata {
             msg!("Mint: {}", __mint);
             return Err($crate::VipersError::InvalidATA.into());
         }
-    };
+    }};
 }
 
 /// Asserts that an account is owned by the given program.
@@ -133,10 +164,17 @@ macro_rules! assert_owner {
     ($program_account: expr, $owner: expr $(,)?) => {
         $crate::assert_owner!($program_account, $owner, "owner mismatch")
     };
-    ($program_account: expr, $owner: expr, $msg: expr $(,)?) => {
+    ($program_account: expr, $owner: ident $(,)?) => {
+        $crate::assert_owner!($program_account, $owner);
+    };
+    ($program_account: expr, $owner: ident, $msg: expr $(,)?) => {
+        let __program_id = $crate::program_ids::$owner::ID;
+        $crate::assert_owner!($program_account, $owner, $msg);
+    };
+    ($program_account: expr, $owner: expr, $msg: expr $(,)?) => {{
         let __program_account =
             *anchor_lang::ToAccountInfo::to_account_info(&$program_account).owner;
-        let __owner = anchor_lang::Key::key(&$owner);
+        let __owner = $owner.key();
         if __program_account != __owner {
             msg!(
                 "Owner mismatch: {}: expected {}, got {}",
@@ -146,14 +184,7 @@ macro_rules! assert_owner {
             );
             return Err($crate::VipersError::OwnerMismatch.into());
         }
-    };
-    ($program_account: expr, $owner: ident $(,)?) => {
-        $crate::assert_owner!($program_account, $owner);
-    };
-    ($program_account: expr, $owner: ident, $msg: expr $(,)?) => {
-        let __program_id = $crate::program_ids::$owner::ID;
-        $crate::assert_owner!($program_account, $owner, $msg);
-    };
+    }};
 }
 
 /// Asserts that two accounts share the same key.
@@ -162,7 +193,7 @@ macro_rules! assert_owner {
 ///
 /// ```should_panic
 /// # use anchor_lang::prelude::*;
-/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
+/// # #[error]
 /// # pub enum ErrorCode { MyError }
 /// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
 /// let one = anchor_lang::solana_program::sysvar::clock::ID;
@@ -174,13 +205,13 @@ macro_rules! assert_owner {
 ///
 /// ```should_panic
 /// # use anchor_lang::prelude::*;
-/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
+/// # #[error]
 /// # pub enum ErrorCode { MyError }
 /// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
 /// let one = anchor_lang::solana_program::sysvar::clock::ID;
 /// let two = anchor_lang::solana_program::system_program::ID;
 /// assert_keys_eq!(one, two, "invalid"); // throws an error
-/// Ok(())
+/// # Ok(())
 /// # }
 /// ```
 #[macro_export]
@@ -202,7 +233,7 @@ macro_rules! assert_keys_eq {
     ($account_a: expr, $account_b: expr, $err: expr $(,)?) => {
         $crate::assert_keys_eq!($account_a, $account_b, $err, $crate::format_err!($err));
     };
-    ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {
+    ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {{
         let __account_a = $account_a.key();
         let __account_b = $account_b.key();
         if __account_a != __account_b {
@@ -212,7 +243,7 @@ macro_rules! assert_keys_eq {
             msg!("Right: {}", __account_b);
             $crate::throw_err!($err);
         }
-    };
+    }};
 }
 
 /// Asserts that two accounts do not share the same key.
@@ -227,7 +258,7 @@ macro_rules! assert_keys_eq {
 /// let one = Pubkey::default();
 /// let two = Pubkey::default();
 /// assert_keys_neq!(one, two); // throws an error
-/// Ok(())
+/// # Ok(())
 /// # }
 /// ```
 #[macro_export]
@@ -253,7 +284,7 @@ macro_rules! assert_keys_neq {
     ($account_a: expr, $account_b: expr, $err: expr $(,)?) => {
         $crate::assert_keys_neq!($account_a, $account_b, $err, $crate::format_err!($err));
     };
-    ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {
+    ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {{
         let __account_a = $account_a.key();
         let __account_b = $account_b.key();
         if __account_a == __account_b {
@@ -263,7 +294,7 @@ macro_rules! assert_keys_neq {
             msg!("Right: {}", __account_b);
             $crate::throw_err!($err);
         }
-    };
+    }};
 }
 
 /// Ensures an [Option] can be unwrapped, otherwise returns the error.
@@ -342,6 +373,51 @@ macro_rules! try_or_err {
 /// invariant!(1 == 2, "incorrect");
 /// # Ok(()) }
 /// ```
+///
+/// Invariants do not throw if they pass.
+///
+/// ```
+/// # use anchor_lang::prelude::*;
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// invariant!(1 == 1, "won't throw");
+/// # Ok(()) }
+/// ```
+///
+/// Error codes are optional:
+///
+/// ```
+/// # use anchor_lang::prelude::*;
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// invariant!(1 == 1);
+/// # Ok(()) }
+/// ```
+///
+/// You may also use a crate ErrorCode:
+///
+/// ```
+/// # #[macro_use] extern crate vipers;
+/// # use anchor_lang::prelude::*;
+/// #[error]
+/// pub enum ErrorCode { MyError }
+///
+/// # fn main() {
+/// assert_does_not_throw!({
+///   invariant!(1 == 1, MyError);
+/// });
+/// assert_throws!({
+///   invariant!(1 == 2);
+/// }, vipers::VipersError::InvariantFailed);
+/// assert_throws!({
+///   invariant!(1 == 2, MyError);
+/// }, ErrorCode::MyError);
+/// assert_throws!({
+///   invariant!(1 == 2, MyError);
+/// }, ErrorCode::MyError);
+/// assert_throws!({
+///   invariant!(1 == 2, MyError, "this is wack");
+/// }, ErrorCode::MyError);
+/// # }
+/// ```
 #[macro_export]
 macro_rules! invariant {
     ($invariant: expr $(,)?) => {
@@ -349,6 +425,9 @@ macro_rules! invariant {
     };
     ($invariant: expr, $err_code: ident $(,)?) => {
         $crate::invariant!($invariant, crate::ErrorCode::$err_code);
+    };
+    ($invariant: expr, $err_code: ident, $msg: expr $(,)?) => {
+        $crate::invariant!($invariant, crate::ErrorCode::$err_code, $msg);
     };
     ($invariant: expr, $msg: literal $(,)?) => {
         $crate::invariant!(
@@ -360,13 +439,13 @@ macro_rules! invariant {
     ($invariant:expr, $err:expr $(,)?) => {
         $crate::invariant!($invariant, $err, $crate::format_err!($err));
     };
-    ($invariant:expr, $err:expr, $msg: expr $(,)?) => {
+    ($invariant:expr, $err:expr, $msg: expr $(,)?) => {{
         if !($invariant) {
             msg!($msg);
             msg!(stringify!($invariant));
             $crate::throw_err!($err);
         }
-    };
+    }};
 }
 
 /// Attempts to unwrap an [Option], and if it fails, prints an error.
