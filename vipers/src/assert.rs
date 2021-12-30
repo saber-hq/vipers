@@ -249,8 +249,9 @@ macro_rules! assert_keys_eq {
         $crate::assert_keys_eq!($account_a, $account_b, $err, $crate::format_err!($err));
     };
     ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {{
-        let __account_a = $account_a.key();
-        let __account_b = $account_b.key();
+        use $crate::borrow_key::BorrowKey;
+        let __account_a = $account_a.borrow_key();
+        let __account_b = $account_b.borrow_key();
         if __account_a != __account_b {
             msg!($msg);
             msg!(stringify!($account_a != $account_b));

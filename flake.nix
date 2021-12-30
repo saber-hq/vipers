@@ -14,7 +14,10 @@
           // saber-overlay.packages.${system};
       in {
         devShell = pkgs.mkShell {
-          buildInputs = with pkgs; [ libiconv anchor-0_19_0 cargo-workspaces ];
+          buildInputs = with pkgs;
+            [ libiconv anchor-0_19_0 cargo-workspaces ]
+            ++ (lib.optionals stdenv.isDarwin
+              (with darwin.apple_sdk.frameworks; [ AppKit IOKit Foundation ]));
         };
       });
 }
