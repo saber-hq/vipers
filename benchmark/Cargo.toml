@@ -1,0 +1,21 @@
+[package]
+name = "vipers-benchmark"
+version = "0.1.0"
+description = "Compute unit logging."
+homepage = "https://saber.so"
+repository = "https://github.com/saber-hq/vipers"
+authors = ["Saber Team <team@saber.so>"]
+license = "Apache-2.0"
+edition = "2021"
+keywords = ["solana", "saber", "anchor", "vipers"]
+
+[dependencies]
+anyhow = "^1.0"
+anchor-client = "0.19.0"
+compute-units = { version = "0.1.0", path = "../programs/compute-units", features = [
+    "no-entrypoint"
+] }
+solana-transaction-status = "^1.9"
+
+[[bin]]
+name = "vipers-benchmark"

@@ -1,0 +1,28 @@
+[package]
+name = "compute-units"
+version = "0.1.0"
+description = "Compute unit logging."
+homepage = "https://saber.so"
+repository = "https://github.com/saber-hq/vipers"
+authors = ["Saber Team <team@saber.so>"]
+license = "Apache-2.0"
+edition = "2021"
+keywords = ["solana", "saber", "anchor", "vipers"]
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "compute_units"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "0.19.0"
+vipers = { version = "^1.5.5", path = "../../vipers" }
+
+[dev-dependencies]
+anchor-client = "0.19.0"

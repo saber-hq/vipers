@@ -1,0 +1,15 @@
+anchor_version = "0.19.0"
+solana_version = "1.8.11"
+
+[registry]
+url = "https://anchor.projectserum.com"
+
+[provider]
+cluster = "localnet"
+wallet = "/Users/igm/.config/solana/id.json"
+
+[scripts]
+test = "cargo run"
+
+[programs.localnet]
+compute_units = "V1persComputeUn1tsTester1111111111111111111"

@@ -4,12 +4,21 @@
 #![allow(rustdoc::missing_doc_code_examples)]
 
 pub mod assert;
+pub mod borrow_key;
 pub mod validate;
 
 use anchor_lang::prelude::*;
 pub use spl_associated_token_account as ata;
 
-pub use validate::Validate;
+/// The prelude contains all commonly used components of the crate.
+/// All Vipers programs should include it via `vipers::prelude::*;`.
+pub mod prelude {
+    pub use super::{
+        assert_ata, assert_is_ata, assert_keys_eq, assert_keys_neq, assert_owner, invariant,
+        program_err, throw_err, try_or_err, unwrap_int, unwrap_opt, unwrap_or_err,
+    };
+    pub use super::{borrow_key::BorrowKey, validate::Validate};
+}
 
 declare_id!("VipersTest111111111111111111111111111111111");
 
