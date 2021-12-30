@@ -6,7 +6,7 @@ homepage = "https://saber.so"
 repository = "https://github.com/saber-hq/vipers"
 authors = ["Saber Team <team@saber.so>"]
 license = "Apache-2.0"
-edition = "2018"
+edition = "2021"
 exclude = ["images/"]
 
 [dependencies]
