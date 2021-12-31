@@ -117,6 +117,10 @@ macro_rules! throw_err {
 /// Warning: this uses a lot of compute units due to the need to generate a PDA.
 /// It is recommended to cache this value.
 #[macro_export]
+#[deprecated(
+    since = "1.5.6",
+    note = "This uses a lot of compute units due to the need to generate a PDA. Use assert_keys_eq on the token account owner instead."
+)]
 macro_rules! assert_ata {
     ($ata: expr, $owner: expr, $mint: expr $(,)?) => {
         assert_ata!($ata, $owner, $mint, "ata mismatch")
@@ -175,6 +179,10 @@ macro_rules! assert_is_ata {
 /// As of Anchor 0.15, Anchor handles this for you automatically.
 /// You should not need to use this.
 #[macro_export]
+#[deprecated(
+    since = "1.5.6",
+    note = "As of Anchor 0.15, Anchor handles this for you automatically."
+)]
 macro_rules! assert_owner {
     ($program_account: expr, $owner: expr $(,)?) => {
         $crate::assert_owner!($program_account, $owner, "owner mismatch")
@@ -524,8 +532,8 @@ mod tests {
         pub byte: u8,
     }
 
-    #[allow(deprecated)]
     #[test]
+    #[allow(deprecated)]
     fn test_compiles_deprecated() -> ProgramResult {
         assert_keys!(token::ID, token::ID, "token program");
 
@@ -533,6 +541,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(deprecated)]
     fn test_compiles() -> ProgramResult {
         assert_ata!(
             get_associated_token_address(&token::ID, &token::ID),
@@ -549,6 +558,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(deprecated)]
     fn test_assert_owner() -> ProgramResult {
         let mut lamports: u64 = 8 + (TestData::default().try_to_vec().unwrap().len() as u64);
 
