@@ -37,4 +37,4 @@ jobs:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
       - uses: Swatinem/rust-cache@v1
       - name: Publish crates
-        run: nix shell .#ci --command cargo workspaces publish --from-git --yes --skip-published --token ${{ secrets.CARGO_PUBLISH_TOKEN }}
+        run: nix shell .#cargo-workspaces --command cargo workspaces publish --from-git --yes --skip-published --token ${{ secrets.CARGO_PUBLISH_TOKEN }}
