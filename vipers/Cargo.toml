@@ -1,6 +1,6 @@
 [package]
 name = "vipers"
-version = "1.5.7"
+version = "1.5.8"
 description = "Assorted checks and validations for writing safer Solana programs."
 homepage = "https://saber.so"
 repository = "https://github.com/saber-hq/vipers"
