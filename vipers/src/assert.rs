@@ -119,7 +119,7 @@ macro_rules! throw_err {
 #[macro_export]
 #[deprecated(
     since = "1.5.6",
-    note = "This uses a lot of compute units due to the need to generate a PDA. Use assert_keys_eq on the token account owner instead."
+    note = "This uses a lot of compute units due to the need to generate a PDA. This is also not a valid way to check ownership since ATAs can be transferred. Use assert_keys_eq on the token account owner instead."
 )]
 macro_rules! assert_ata {
     ($ata: expr, $owner: expr, $mint: expr $(,)?) => {
