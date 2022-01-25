@@ -47,4 +47,6 @@ pub enum VipersError {
     OptionUnwrapFailed,
     #[msg("Keys must not match.")]
     KeysMustNotMatch,
+    #[msg("The provided token account is non-zero: amount must be zero, it should not have a delegate, and it should not have a close authority.")]
+    TokenAccountIsNonZero,
 }

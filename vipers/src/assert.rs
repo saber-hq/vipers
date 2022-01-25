@@ -269,6 +269,84 @@ macro_rules! assert_keys_eq {
     }};
 }
 
+/// Asserts that a token account is "zero".
+///
+/// This means that:
+/// - the `amount` is zero
+/// - the `delegate` is `None`
+/// - the `close_authority` is `None`
+///
+/// This is useful for checking to see that a bad actor cannot
+/// modify PDA-owned token accounts.
+///
+/// # Example
+///
+/// ```
+/// # #[macro_use] extern crate vipers;
+/// # use anchor_lang::prelude::*;
+/// # use anchor_spl::token::*;
+/// #[error]
+/// pub enum ErrorCode { MyError }
+///
+/// # fn main() {
+///
+/// let mut zero_account = spl_token::state::Account::default();
+/// assert_does_not_throw!({
+///   assert_is_zero_token_account!(zero_account);
+/// });
+///
+/// let mut non_zero_account = spl_token::state::Account::default();
+/// non_zero_account.amount = 10;
+/// assert_throws!({
+///   assert_is_zero_token_account!(non_zero_account);
+/// }, vipers::VipersError::TokenAccountIsNonZero);
+///
+/// non_zero_account = spl_token::state::Account::default();
+/// non_zero_account.delegate = spl_token::ID.into();
+/// assert_throws!({
+///   assert_is_zero_token_account!(non_zero_account);
+/// }, vipers::VipersError::TokenAccountIsNonZero);
+///
+/// non_zero_account = spl_token::state::Account::default();
+/// non_zero_account.close_authority = spl_token::ID.into();
+/// assert_throws!({
+///   assert_is_zero_token_account!(non_zero_account);
+/// }, vipers::VipersError::TokenAccountIsNonZero);
+/// # }
+/// ```
+#[macro_export]
+macro_rules! assert_is_zero_token_account {
+    ($token_account: expr $(,)?) => {
+        $crate::assert_is_zero_token_account!(
+            $token_account,
+            $crate::VipersError::TokenAccountIsNonZero
+        );
+    };
+    ($token_account: expr, $err_code: ident $(,)?) => {
+        $crate::assert_is_zero_token_account!($token_account, crate::ErrorCode::$err_code);
+    };
+    ($token_account: expr, $msg: literal $(,)?) => {
+        $crate::assert_is_zero_token_account!(
+            $account_a,
+            $account_b,
+            $crate::VipersError::TokenAccountIsNonZero,
+            &*format!("Token account is non-zero: {}", $msg),
+        );
+    };
+    ($token_account: expr, $err: expr $(,)?) => {
+        $crate::assert_is_zero_token_account!($token_account, $err, $crate::format_err!($err));
+    };
+    ($token_account: expr, $err: expr, $msg: expr $(,)?) => {{
+        $crate::invariant!(
+            $token_account.amount == 0
+                && $token_account.delegate.is_none()
+                && $token_account.close_authority.is_none(),
+            $err,
+            $msg
+        );
+    }};
+}
+
 /// Asserts that two accounts do not share the same key.
 ///
 /// # Example

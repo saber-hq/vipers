@@ -16,3 +16,6 @@ anchor-spl = ">=0.17.0"
 spl-associated-token-account = { version = "^1.0.3", features = [
     "no-entrypoint"
 ] }
+
+[dev-dependencies]
+spl-token = { version = "^3.3.0", features = ["no-entrypoint"] }
