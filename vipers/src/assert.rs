@@ -755,6 +755,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::eq_op)]
     fn test_invariant() {
         assert_does_not_throw!({
             invariant!(1 == 1, ErrorCode::MyError);
