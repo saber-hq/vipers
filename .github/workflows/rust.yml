@@ -69,3 +69,27 @@ jobs:
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v1
       - run: cargo doc
+
+  coverage:
+    name: Rust project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Rust nightly
+        uses: actions-rs/toolchain@v1
+        with:
+          override: true
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+
+      - name: Run cargo-tarpaulin
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          version: "0.19.1"
+
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v1
+        with:
+          name: code-coverage-report
+          path: cobertura.xml

@@ -16,7 +16,7 @@
         packages.cargo-workspaces = pkgs.cargo-workspaces;
         devShell = pkgs.mkShell {
           buildInputs = with pkgs;
-            [ libiconv anchor-0_20_0 cargo-workspaces cargo-tarpaulin ]
+            [ libiconv anchor-0_20_0 cargo-workspaces ]
             ++ (lib.optionals stdenv.isDarwin
               (with darwin.apple_sdk.frameworks; [ AppKit IOKit Foundation ]));
         };
