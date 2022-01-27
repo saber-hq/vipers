@@ -26,6 +26,9 @@ declare_id!("VipersTest111111111111111111111111111111111");
 /// assert!(validate_derived_address(
 ///   &expected, &vipers::ID, seeds
 /// ));
+/// assert!(!validate_derived_address(
+///   &solana_program::system_program::ID, &vipers::ID, seeds
+/// ));
 /// ```
 pub fn validate_derived_address(
     derived_address: &Pubkey,
@@ -43,7 +46,7 @@ pub mod prelude {
 
     pub use super::{
         assert_is_zero_token_account, assert_keys_eq, assert_keys_neq, invariant, try_or_err,
-        unwrap_int, unwrap_opt, unwrap_opt_block, unwrap_or_err, Validate,
+        unwrap_int, unwrap_opt, unwrap_opt_block, unwrap_or_err, Validate, VipersError,
     };
 }
 

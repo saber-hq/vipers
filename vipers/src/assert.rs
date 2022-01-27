@@ -1,6 +1,6 @@
 //! Various assertions.
 
-/// Runs a block, returning a ProgramResult.
+/// Runs a block, returning a [anchor_lang::prelude::ProgramResult].
 #[macro_export]
 macro_rules! test_assertion {
     ($body: block) => {
@@ -104,29 +104,12 @@ macro_rules! log_code_location {
 /// # Ok(())
 /// # }
 /// ```
-///
-/// A failing example:
-///
-/// ```
-/// # use anchor_lang::prelude::*;
-/// # #[error]
-/// # pub enum ErrorCode { MyError }
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
-/// assert_throws!({
-///   let result = unwrap_opt_block!({
-///     let one: u64 = 1;
-///     let three: u64 = 3;
-///     let four = one.checked_add(u64::MAX)?;
-///     four.checked_add(3)
-///   }, MyError);
-/// }, ErrorCode::MyError);
-/// # Ok(())
-/// # }
-/// ```
 #[macro_export]
 macro_rules! unwrap_opt_block {
     ($body:block $($arg:tt)*) => {
-        $crate::unwrap_opt!((|| { $body })() $($arg)*)
+        $crate::unwrap_opt!(
+            #[allow(clippy::redundant_closure_call)]
+            (|| { $body } )() $($arg)*)
     };
 }
 
@@ -137,14 +120,12 @@ macro_rules! unwrap_opt_block {
 /// ```
 /// # use anchor_lang::prelude::*;
 /// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
-/// assert_throws!({
-///   let result = unwrap_checked!({
-///     let one: u64 = 1;
-///     let three: u64 = 3;
-///     let four = one.checked_add(u64::MAX)?;
-///     four.checked_add(3)
-///   });
-/// }, vipers::VipersError::IntegerOverflow);
+/// let result = unwrap_checked!({
+///   let one: u64 = 1;
+///   let three: u64 = 3;
+///   one.checked_add(three)
+/// });
+/// assert_eq!(result, 4);
 /// # Ok(())
 /// # }
 /// ```
@@ -677,9 +658,15 @@ macro_rules! assert_keys {
 
 #[cfg(test)]
 mod tests {
+    use crate::prelude::*;
     use anchor_lang::prelude::*;
     use anchor_spl::token;
     use spl_associated_token_account::get_associated_token_address;
+
+    #[error]
+    pub enum ErrorCode {
+        MyError,
+    }
 
     #[account]
     #[derive(Default)]
@@ -734,5 +721,73 @@ mod tests {
         assert_owner!(info, crate::ID);
 
         Ok(())
+    }
+
+    #[test]
+    fn test_unwrap_checked() -> ProgramResult {
+        assert_throws!(
+            {
+                unwrap_checked!({
+                    let one: u64 = 1;
+                    let four = one.checked_add(u64::MAX)?;
+                    four.checked_add(3)
+                });
+            },
+            VipersError::IntegerOverflow
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_unwrap_opt_block() {
+        assert_throws!(
+            {
+                unwrap_opt_block!(
+                    {
+                        let one: u64 = 1;
+                        one.checked_add(u64::MAX)
+                    },
+                    ErrorCode::MyError
+                );
+            },
+            ErrorCode::MyError
+        );
+    }
+
+    #[test]
+    fn test_invariant() {
+        assert_does_not_throw!({
+            invariant!(1 == 1, ErrorCode::MyError);
+        });
+        assert_throws!(
+            {
+                invariant!(1 == 2);
+            },
+            VipersError::InvariantFailed
+        );
+        assert_throws!(
+            {
+                invariant!(1 == 2, "this is stupid");
+            },
+            VipersError::InvariantFailed
+        );
+        assert_throws!(
+            {
+                invariant!(1 == 2, ErrorCode::MyError);
+            },
+            ErrorCode::MyError
+        );
+        assert_throws!(
+            {
+                invariant!(1 == 2, ErrorCode::MyError);
+            },
+            ErrorCode::MyError
+        );
+        assert_throws!(
+            {
+                invariant!(1 == 2, ErrorCode::MyError, "this is wack");
+            },
+            ErrorCode::MyError
+        );
     }
 }
