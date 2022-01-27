@@ -12,6 +12,7 @@ env:
 
 jobs:
   lint:
+    name: Clippy/Rustfmt
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -27,6 +28,7 @@ jobs:
       - run: cargo clippy --all-targets -- --deny=warnings
 
   check:
+    name: Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -42,6 +44,7 @@ jobs:
       - run: cargo check
 
   test:
+    name: Unit Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -56,6 +59,7 @@ jobs:
       - run: cargo test
 
   doc:
+    name: Documentation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -71,7 +75,7 @@ jobs:
       - run: cargo doc
 
   coverage:
-    name: Rust project
+    name: Code Coverage
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -82,6 +86,8 @@ jobs:
         with:
           override: true
           toolchain: ${{ env.RUST_TOOLCHAIN }}
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v1
 
       - name: Run cargo-tarpaulin
         uses: actions-rs/tarpaulin@v0.1
