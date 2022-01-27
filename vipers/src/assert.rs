@@ -85,13 +85,61 @@ macro_rules! log_code_location {
     };
 }
 
+/// Unwraps a block which returns an [Option].
+///
+/// This is useful for running checked math expressions within a function which returns [Result].
+///
+/// # Examples
+///
+/// ```
+/// # use anchor_lang::prelude::*;
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// let result = unwrap_opt_block!({
+///     let one: u64 = 1;
+///     let three: u64 = 3;
+///     let four = one.checked_add(three)?;
+///     four.checked_add(3)
+/// });
+/// assert_eq!(result, 7);
+/// # Ok(())
+/// # }
+/// ```
+///
+/// A failing example:
+///
+/// ```
+/// # use anchor_lang::prelude::*;
+/// # #[error]
+/// # pub enum ErrorCode { MyError }
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// assert_throws!({
+///   let result = unwrap_opt_block!({
+///     let one: u64 = 1;
+///     let three: u64 = 3;
+///     let four = one.checked_add(u64::MAX)?;
+///     four.checked_add(3)
+///   }, MyError);
+/// }, ErrorCode::MyError);
+/// # Ok(())
+/// # }
+/// ```
+#[macro_export]
+macro_rules! unwrap_opt_block {
+    ($body:block $(,)?) => {
+        $crate::unwrap_opt!((|| { $body })())
+    };
+    ($body:block, $($arg:tt),*  $(,)?) => {
+        $crate::unwrap_opt!((|| { $body })(), $($arg),*)
+    };
+}
+
 /// Throws an error.
 ///
 /// # Example
 ///
 /// ```
 /// # use anchor_lang::prelude::*;
-/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
+/// # #[error]
 /// # pub enum ErrorCode { MyError }
 /// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
 /// let fail = false;
@@ -566,6 +614,13 @@ macro_rules! invariant {
 /// ```
 #[macro_export]
 macro_rules! unwrap_opt {
+    ($option: expr $(,)?) => {
+        $crate::unwrap_opt!(
+            $option,
+            $crate::VipersError::OptionUnwrapFailed,
+            $crate::format_err!($crate::VipersError::OptionUnwrapFailed)
+        )
+    };
     ($option: expr, $err_code: ident $(,)?) => {
         $crate::unwrap_opt!($option, crate::ErrorCode::$err_code)
     };
@@ -578,8 +633,9 @@ macro_rules! unwrap_opt {
     ($option:expr, $err:expr, $msg: expr $(,)?) => {
         $option.ok_or_else(|| -> ProgramError {
             msg!("Option unwrap failed: {:?}", $err);
+            msg!(stringify!($option));
             $crate::log_code_location!();
-            $crate::VipersError::OptionUnwrapFailed.into()
+            $err.into()
         })?
     };
 }
