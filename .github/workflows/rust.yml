@@ -85,7 +85,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           override: true
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          toolchain: nightly-2022-01-26
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v1
 
