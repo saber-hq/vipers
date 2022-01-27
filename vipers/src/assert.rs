@@ -397,8 +397,7 @@ macro_rules! assert_is_zero_token_account {
     };
     ($token_account: expr, $msg: literal $(,)?) => {
         $crate::assert_is_zero_token_account!(
-            $account_a,
-            $account_b,
+            $token_account,
             $crate::VipersError::TokenAccountIsNonZero,
             &*format!("Token account is non-zero: {}", $msg),
         );
