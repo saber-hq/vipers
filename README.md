@@ -4,6 +4,7 @@
 [![License](https://img.shields.io/crates/l/vipers)](https://github.com/saber-hq/vipers/blob/master/LICENSE.txt)
 [![Build Status](https://img.shields.io/github/workflow/status/saber-hq/vipers/Rust/master)](https://github.com/saber-hq/vipers/actions/workflows/rust.yml?query=branch%3Amaster)
 [![Contributors](https://img.shields.io/github/contributors/saber-hq/vipers)](https://github.com/saber-hq/vipers/graphs/contributors)
+[![Code Coverage](https://img.shields.io/codecov/c/github/saber-hq/vipers)](https://app.codecov.io/gh/saber-hq/vipers)
 
 <p align="center">
     <img src="/images/banner.png" />
