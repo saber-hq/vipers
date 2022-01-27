@@ -32,7 +32,6 @@ pub fn validate_derived_address(
     program_id: &Pubkey,
     seeds: &[&[u8]],
 ) -> bool {
-    println!("test");
     match Pubkey::create_program_address(seeds, program_id) {
         Ok(ref key) => derived_address == key,
         _ => false,
