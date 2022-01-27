@@ -93,7 +93,7 @@ jobs:
         uses: actions-rs/tarpaulin@v0.1
         with:
           version: "0.19.1"
-          args: --run-types Tests,Doctests
+          run-types: Tests,Doctests
 
       - name: Upload to Codecov.io
         uses: codecov/codecov-action@v1.0.2
