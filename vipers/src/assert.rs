@@ -72,7 +72,7 @@ macro_rules! format_err {
 /// ```
 #[macro_export]
 macro_rules! program_err {
-    ($error:tt $(,)?) => {
+    ($error:ident $(,)?) => {
         Err(crate::ErrorCode::$error.into())
     };
 }
@@ -125,11 +125,33 @@ macro_rules! log_code_location {
 /// ```
 #[macro_export]
 macro_rules! unwrap_opt_block {
-    ($body:block $(,)?) => {
-        $crate::unwrap_opt!((|| { $body })())
+    ($body:block $($arg:tt)*) => {
+        $crate::unwrap_opt!((|| { $body })() $($arg)*)
     };
-    ($body:block, $($arg:tt),*  $(,)?) => {
-        $crate::unwrap_opt!((|| { $body })(), $($arg),*)
+}
+
+/// Unwraps the result of a block of checked integer math.
+///
+/// # Example
+///
+/// ```
+/// # use anchor_lang::prelude::*;
+/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// assert_throws!({
+///   let result = unwrap_checked!({
+///     let one: u64 = 1;
+///     let three: u64 = 3;
+///     let four = one.checked_add(u64::MAX)?;
+///     four.checked_add(3)
+///   });
+/// }, vipers::VipersError::IntegerOverflow);
+/// # Ok(())
+/// # }
+/// ```
+#[macro_export]
+macro_rules! unwrap_checked {
+    ($body:block $(,)?) => {
+        $crate::unwrap_opt_block!($body, $crate::VipersError::IntegerOverflow)
     };
 }
 
@@ -463,7 +485,7 @@ macro_rules! assert_keys_neq {
 /// ```
 #[macro_export]
 macro_rules! unwrap_or_err {
-    ($option:expr, $error:tt $(,)?) => {
+    ($option:expr, $error:ident $(,)?) => {
         $option.ok_or_else(|| -> ProgramError { crate::ErrorCode::$error.into() })?
     };
 }
@@ -506,7 +528,7 @@ macro_rules! unwrap_int {
 /// ```
 #[macro_export]
 macro_rules! try_or_err {
-    ($result:expr, $error:tt $(,)?) => {
+    ($result:expr, $error:ident $(,)?) => {
         $result.map_err(|_| -> ProgramError { crate::ErrorCode::$error.into() })?
     };
 }
