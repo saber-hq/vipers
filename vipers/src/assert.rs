@@ -190,7 +190,7 @@ macro_rules! assert_ata {
             );
             msg!("Owner: {}", __owner);
             msg!("Mint: {}", __mint);
-            return Err($crate::VipersError::ATAMismatch.into());
+            $crate::throw_err!($crate::VipersError::ATAMismatch);
         }
     }};
 }
@@ -220,7 +220,7 @@ macro_rules! assert_is_ata {
             );
             msg!("Owner: {}", __owner);
             msg!("Mint: {}", __mint);
-            return Err($crate::VipersError::InvalidATA.into());
+            $crate::throw_err!($crate::VipersError::InvalidATA);
         }
     }};
 }
