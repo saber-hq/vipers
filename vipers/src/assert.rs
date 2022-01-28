@@ -174,7 +174,7 @@ macro_rules! throw_err {
 )]
 macro_rules! assert_ata {
     ($ata: expr, $owner: expr, $mint: expr $(,)?) => {
-        assert_ata!($ata, $owner, $mint, "ata mismatch")
+        $crate::assert_ata!($ata, $owner, $mint, "ata mismatch")
     };
     ($ata: expr, $owner: expr, $mint: expr, $msg: expr $(,)?) => {{
         let __owner = anchor_lang::Key::key(&$owner);
