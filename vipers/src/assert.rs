@@ -309,8 +309,10 @@ macro_rules! assert_keys_eq {
         $crate::assert_keys_eq!($account_a, $account_b, $err, $crate::format_err!($err));
     };
     ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {{
-        let __account_a = $crate::AsKeyRef::as_key_ref(&$account_a);
-        let __account_b = $crate::AsKeyRef::as_key_ref(&$account_b);
+        let __key_a = &$account_a;
+        let __key_b = &$account_b;
+        let __account_a = $crate::AsKeyRef::as_key_ref(__key_a);
+        let __account_b = $crate::AsKeyRef::as_key_ref(__key_b);
         if __account_a != __account_b {
             msg!($msg);
             msg!(stringify!($account_a != $account_b));
@@ -437,8 +439,10 @@ macro_rules! assert_keys_neq {
         $crate::assert_keys_neq!($account_a, $account_b, $err, $crate::format_err!($err));
     };
     ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {{
-        let __account_a = $crate::AsKeyRef::as_key_ref(&$account_a);
-        let __account_b = $crate::AsKeyRef::as_key_ref(&$account_b);
+        let __key_a = &$account_a;
+        let __key_b = &$account_b;
+        let __account_a = $crate::AsKeyRef::as_key_ref(__key_a);
+        let __account_b = $crate::AsKeyRef::as_key_ref(__key_b);
         if __account_a == __account_b {
             msg!($msg);
             msg!(stringify!($account_a == $account_b));
