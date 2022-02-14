@@ -4,9 +4,11 @@
 #![allow(rustdoc::missing_doc_code_examples)]
 
 pub mod assert;
+mod keyref;
 pub mod validate;
 
 use anchor_lang::prelude::*;
+pub use keyref::AsKeyRef;
 pub use spl_associated_token_account as ata;
 
 pub use validate::Validate;
@@ -46,7 +48,7 @@ pub mod prelude {
 
     pub use super::{
         assert_is_zero_token_account, assert_keys_eq, assert_keys_neq, invariant, try_or_err,
-        unwrap_int, unwrap_opt, unwrap_opt_block, unwrap_or_err, Validate, VipersError,
+        unwrap_int, unwrap_opt, unwrap_opt_block, unwrap_or_err, AsKeyRef, Validate, VipersError,
     };
 }
 
