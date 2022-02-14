@@ -25,7 +25,10 @@ use anchor_lang::prelude::*;
 
 declare_id!("VipersTest111111111111111111111111111111111");
 
-use anchor_spl::{associated_token::get_associated_token_address, token};
+use anchor_spl::{
+    associated_token::get_associated_token_address,
+    token::{self},
+};
 use vipers::*;
 
 #[error]
@@ -164,6 +167,40 @@ fn test_assert_keys_eq_pass() {
             "this is wack"
         );
     });
+}
+
+use crate::anchor_lang::solana_program::program_pack::Pack;
+
+#[test]
+fn test_assert_keys_eq_boxed() {
+    let key = Pubkey::new_unique();
+    let lamports = &mut 0;
+
+    let token_account_data = spl_token::state::Account {
+        state: spl_token::state::AccountState::Initialized,
+        ..Default::default()
+    };
+
+    let mut out = [0; 165];
+    token_account_data.pack_into_slice(&mut out);
+    let account_a = AccountInfo::new(&key, false, false, lamports, &mut out, &token::ID, false, 0);
+    let box_a: Box<Account<anchor_spl::token::TokenAccount>> =
+        Box::new(Account::try_from_unchecked(&account_a).unwrap());
+
+    assert_does_not_throw!({
+        assert_keys_eq!(key, box_a);
+    });
+
+    assert_throws!(
+        {
+            assert_keys_eq!(
+                box_a,
+                anchor_lang::solana_program::system_program::ID,
+                ErrorCode::MyError,
+            )
+        },
+        ErrorCode::MyError
+    );
 }
 
 #[test]

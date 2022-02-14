@@ -16,6 +16,14 @@ impl AsKeyRef for Pubkey {
 }
 
 impl<'info, T: AccountSerialize + AccountDeserialize + Owner + Clone> AsKeyRef
+    for Box<Account<'info, T>>
+{
+    fn as_key_ref(&self) -> &Pubkey {
+        self.as_ref().as_key_ref()
+    }
+}
+
+impl<'info, T: AccountSerialize + AccountDeserialize + Owner + Clone> AsKeyRef
     for Account<'info, T>
 {
     fn as_key_ref(&self) -> &Pubkey {
