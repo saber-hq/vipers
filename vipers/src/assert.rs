@@ -177,19 +177,20 @@ macro_rules! assert_ata {
         $crate::assert_ata!($ata, $owner, $mint, "ata mismatch")
     };
     ($ata: expr, $owner: expr, $mint: expr, $msg: expr $(,)?) => {{
-        let __owner = anchor_lang::Key::key(&$owner);
-        let __mint = anchor_lang::Key::key(&$mint);
-        let __ata = anchor_lang::Key::key(&$ata);
-        let __real_ata = $crate::ata::get_associated_token_address(&__owner, &__mint);
-        if __real_ata != __ata {
+        let __ata = $crate::AsKeyRef::as_key_ref(&$ata);
+        let __real_ata = $crate::ata::get_associated_token_address(
+            $crate::AsKeyRef::as_key_ref(&$owner),
+            $crate::AsKeyRef::as_key_ref(&$mint),
+        );
+        if &__real_ata != __ata {
             msg!(
                 "ATA mismatch: {}: {} (left) != {} (right)",
                 $msg,
                 __ata,
                 __real_ata
             );
-            msg!("Owner: {}", __owner);
-            msg!("Mint: {}", __mint);
+            msg!("Owner: {}", $crate::AsKeyRef::as_key_ref(&$owner));
+            msg!("Mint: {}", $crate::AsKeyRef::as_key_ref(&$mint));
             $crate::throw_err!($crate::VipersError::ATAMismatch);
         }
     }};
@@ -247,8 +248,8 @@ macro_rules! assert_owner {
     };
     ($program_account: expr, $owner: expr, $msg: expr $(,)?) => {{
         let __program_account =
-            *anchor_lang::ToAccountInfo::to_account_info(&$program_account).owner;
-        let __owner = $owner.key();
+            anchor_lang::ToAccountInfo::to_account_info(&$program_account).owner;
+        let __owner = $crate::AsKeyRef::as_key_ref(&$owner);
         if __program_account != __owner {
             msg!(
                 "Owner mismatch: {}: expected {}, got {}",
@@ -308,8 +309,8 @@ macro_rules! assert_keys_eq {
         $crate::assert_keys_eq!($account_a, $account_b, $err, $crate::format_err!($err));
     };
     ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {{
-        let __account_a = $account_a.key();
-        let __account_b = $account_b.key();
+        let __account_a = $crate::AsKeyRef::as_key_ref(&$account_a);
+        let __account_b = $crate::AsKeyRef::as_key_ref(&$account_b);
         if __account_a != __account_b {
             msg!($msg);
             msg!(stringify!($account_a != $account_b));
@@ -436,8 +437,8 @@ macro_rules! assert_keys_neq {
         $crate::assert_keys_neq!($account_a, $account_b, $err, $crate::format_err!($err));
     };
     ($account_a: expr, $account_b: expr, $err: expr, $msg: expr $(,)?) => {{
-        let __account_a = $account_a.key();
-        let __account_b = $account_b.key();
+        let __account_a = $crate::AsKeyRef::as_key_ref(&$account_a);
+        let __account_b = $crate::AsKeyRef::as_key_ref(&$account_b);
         if __account_a == __account_b {
             msg!($msg);
             msg!(stringify!($account_a == $account_b));
@@ -685,12 +686,8 @@ mod tests {
     #[test]
     #[allow(deprecated)]
     fn test_compiles() -> ProgramResult {
-        assert_ata!(
-            get_associated_token_address(&token::ID, &token::ID),
-            token::ID,
-            token::ID,
-            "ATA"
-        );
+        let ata = get_associated_token_address(&token::ID, &token::ID);
+        assert_ata!(ata, token::ID, token::ID, "ATA");
 
         let weird_math: Option<i32> = (1_i32).checked_add(2);
         let _result = unwrap_int!(weird_math);
@@ -787,6 +784,35 @@ mod tests {
         assert_throws!(
             {
                 invariant!(1 == 2, ErrorCode::MyError, "this is wack");
+            },
+            ErrorCode::MyError
+        );
+    }
+
+    #[test]
+    fn test_assert_keys_neq_pass() {
+        assert_does_not_throw!({
+            let default = Pubkey::default();
+            assert_keys_neq!(
+                default,
+                anchor_lang::solana_program::sysvar::rent::ID,
+                ErrorCode::MyError,
+                "this is wack"
+            );
+        });
+    }
+
+    #[test]
+    fn test_assert_keys_neq_no_match() {
+        assert_throws!(
+            {
+                let default = Pubkey::default();
+                assert_keys_neq!(
+                    default,
+                    anchor_lang::solana_program::system_program::ID,
+                    ErrorCode::MyError,
+                    "this is wack"
+                )
             },
             ErrorCode::MyError
         );
