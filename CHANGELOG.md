@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2022-02-14
+
 ### Fixes
 
 - Support Anchor 0.21.x by adding `AsKeyRef` ([#31](https://github.com/saber-hq/vipers/pull/31)).
