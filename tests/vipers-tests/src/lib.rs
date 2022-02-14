@@ -172,6 +172,7 @@ fn test_assert_keys_eq_pass() {
 use crate::anchor_lang::solana_program::program_pack::Pack;
 
 #[test]
+#[cfg(feature = "anchor-0_21_0")]
 fn test_assert_keys_eq_boxed() {
     let key = Pubkey::new_unique();
     let lamports = &mut 0;
