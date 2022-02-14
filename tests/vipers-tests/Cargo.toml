@@ -7,7 +7,6 @@ repository = "https://github.com/saber-hq/vipers"
 authors = ["Saber Team <team@saber.so>"]
 license = "Apache-2.0"
 edition = "2021"
-readme = "../../README.md"
 keywords = ["solana", "saber", "anchor"]
 
 [features]
