@@ -154,6 +154,35 @@ fn test_invariant() {
 }
 
 #[test]
+fn test_assert_keys_eq_pass() {
+    assert_does_not_throw!({
+        let default = Pubkey::default();
+        assert_keys_eq!(
+            default,
+            anchor_lang::solana_program::system_program::ID,
+            ErrorCode::MyError,
+            "this is wack"
+        );
+    });
+}
+
+#[test]
+fn test_assert_keys_eq_no_match() {
+    assert_throws!(
+        {
+            let default = Pubkey::default();
+            assert_keys_eq!(
+                default,
+                anchor_lang::solana_program::sysvar::rent::ID,
+                ErrorCode::MyError,
+                "this is wack"
+            )
+        },
+        ErrorCode::MyError
+    );
+}
+
+#[test]
 fn test_assert_keys_neq_pass() {
     assert_does_not_throw!({
         let default = Pubkey::default();
