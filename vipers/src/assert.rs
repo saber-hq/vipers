@@ -17,7 +17,7 @@ macro_rules! test_assertion {
 #[macro_export]
 macro_rules! assert_does_not_throw {
     ($body: block $(,)?) => {
-        assert_eq!(test_assertion!($body), Ok(()))
+        assert_eq!($crate::test_assertion!($body), Ok(()))
     };
 }
 
@@ -27,7 +27,7 @@ macro_rules! assert_does_not_throw {
 #[macro_export]
 macro_rules! assert_throws {
     ($body: block, $right: expr $(,)?) => {
-        assert_eq!(test_assertion!($body), Err($right.into()))
+        assert_eq!($crate::test_assertion!($body), Err($right.into()))
     };
 }
 
@@ -655,166 +655,4 @@ macro_rules! assert_keys {
     ($account_a: expr, $account_b: expr, $msg: expr $(,)?) => {
         $crate::assert_keys_eq!($account_a, $account_b, $msg)
     };
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::prelude::*;
-    use anchor_lang::prelude::*;
-    use anchor_spl::token;
-    use spl_associated_token_account::get_associated_token_address;
-
-    #[error]
-    pub enum ErrorCode {
-        MyError,
-    }
-
-    #[account]
-    #[derive(Default)]
-    struct TestData {
-        pub byte: u8,
-    }
-
-    #[test]
-    #[allow(deprecated)]
-    fn test_compiles_deprecated() -> ProgramResult {
-        assert_keys!(token::ID, token::ID, "token program");
-
-        Ok(())
-    }
-
-    #[test]
-    #[allow(deprecated)]
-    fn test_compiles() -> ProgramResult {
-        let ata = get_associated_token_address(&token::ID, &token::ID);
-        assert_ata!(ata, token::ID, token::ID, "ATA");
-
-        let weird_math: Option<i32> = (1_i32).checked_add(2);
-        let _result = unwrap_int!(weird_math);
-        unwrap_opt!(weird_math, "aaa");
-
-        Ok(())
-    }
-
-    #[test]
-    #[allow(deprecated)]
-    fn test_assert_owner() -> ProgramResult {
-        let mut lamports: u64 = 8 + (TestData::default().try_to_vec().unwrap().len() as u64);
-
-        let mut buffer: [u8; 16] = [0; 16];
-        let mut buf: &mut [u8] = &mut buffer;
-        TestData::default().try_serialize(&mut buf)?;
-
-        let info: Account<TestData> = Account::try_from(&AccountInfo::new(
-            &crate::ID,
-            false,
-            false,
-            &mut lamports,
-            &mut buffer,
-            &crate::ID,
-            false,
-            0,
-        ))?;
-        assert_owner!(info, crate::ID);
-
-        Ok(())
-    }
-
-    #[test]
-    fn test_unwrap_checked() -> ProgramResult {
-        assert_throws!(
-            {
-                unwrap_checked!({
-                    let one: u64 = 1;
-                    let four = one.checked_add(u64::MAX)?;
-                    four.checked_add(3)
-                });
-            },
-            VipersError::IntegerOverflow
-        );
-        Ok(())
-    }
-
-    #[test]
-    fn test_unwrap_opt_block() {
-        assert_throws!(
-            {
-                unwrap_opt_block!(
-                    {
-                        let one: u64 = 1;
-                        one.checked_add(u64::MAX)
-                    },
-                    ErrorCode::MyError
-                );
-            },
-            ErrorCode::MyError
-        );
-    }
-
-    #[test]
-    #[allow(clippy::eq_op)]
-    fn test_invariant() {
-        assert_does_not_throw!({
-            invariant!(1 == 1, ErrorCode::MyError);
-        });
-        assert_throws!(
-            {
-                invariant!(1 == 2);
-            },
-            VipersError::InvariantFailed
-        );
-        assert_throws!(
-            {
-                invariant!(1 == 2, "this is stupid");
-            },
-            VipersError::InvariantFailed
-        );
-        assert_throws!(
-            {
-                invariant!(1 == 2, ErrorCode::MyError);
-            },
-            ErrorCode::MyError
-        );
-        assert_throws!(
-            {
-                invariant!(1 == 2, ErrorCode::MyError);
-            },
-            ErrorCode::MyError
-        );
-        assert_throws!(
-            {
-                invariant!(1 == 2, ErrorCode::MyError, "this is wack");
-            },
-            ErrorCode::MyError
-        );
-    }
-
-    #[test]
-    fn test_assert_keys_neq_pass() {
-        assert_does_not_throw!({
-            let default = Pubkey::default();
-            assert_keys_neq!(
-                default,
-                anchor_lang::solana_program::sysvar::rent::ID,
-                ErrorCode::MyError,
-                "this is wack"
-            );
-        });
-    }
-
-    #[test]
-    fn test_assert_keys_neq_no_match() {
-        assert_throws!(
-            {
-                let default = Pubkey::default();
-                assert_keys_neq!(
-                    default,
-                    anchor_lang::solana_program::system_program::ID,
-                    ErrorCode::MyError,
-                    "this is wack"
-                )
-            },
-            ErrorCode::MyError
-        );
-    }
 }

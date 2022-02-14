@@ -48,7 +48,8 @@ pub mod prelude {
 
     pub use super::{
         assert_is_zero_token_account, assert_keys_eq, assert_keys_neq, invariant, try_or_err,
-        unwrap_int, unwrap_opt, unwrap_opt_block, unwrap_or_err, AsKeyRef, Validate, VipersError,
+        unwrap_checked, unwrap_int, unwrap_opt, unwrap_opt_block, unwrap_or_err, AsKeyRef,
+        Validate, VipersError,
     };
 }
 
