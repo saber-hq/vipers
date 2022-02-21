@@ -9,12 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
-- Adds `ComparableError`, which allows comparing errors.
+- Adds `CmpError`, which allows comparing errors ([#33](https://github.com/saber-hq/vipers/pull/33)).
 
 ### Breaking
 
 - Make `spl-associated-token-account` an optional dependency ([#32](https://github.com/saber-hq/vipers/pull/32)).
-- Remove support for Anchor versions older than 0.22.
+- Remove support for Anchor versions older than 0.22 ([#33](https://github.com/saber-hq/vipers/pull/33)).
 
 ## [1.6.0] - 2022-02-14
 
