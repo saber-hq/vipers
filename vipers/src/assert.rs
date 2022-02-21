@@ -167,6 +167,7 @@ macro_rules! throw_err {
 ///
 /// Warning: this uses a lot of compute units due to the need to generate a PDA.
 /// It is recommended to cache this value.
+#[cfg(feature = "spl-associated-token-account")]
 #[macro_export]
 #[deprecated(
     since = "1.5.6",

@@ -25,7 +25,9 @@ anchor-lang-0_19_0 = { version = "=0.19.0", package = "anchor-lang", optional = 
 anchor-spl-0_19_0 = { version = "=0.19.0", package = "anchor-spl", optional = true }
 anchor-lang-0_18_2 = { version = "=0.18.2", package = "anchor-lang", optional = true }
 anchor-spl-0_18_2 = { version = "=0.18.2", package = "anchor-spl", optional = true }
-vipers = { path = "../../vipers", version = "^1" }
+vipers = { path = "../../vipers", version = "^1", features = [
+    "spl-associated-token-account"
+] }
 
 [dev-dependencies]
 spl-token = { version = "^3", features = ["no-entrypoint"] }
