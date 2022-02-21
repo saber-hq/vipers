@@ -29,36 +29,38 @@ pub enum VipersError {
     TokenAccountIsNonZero,
 }
 
+/// Conversions into a [VipersWrappedError].
 pub trait IntoVipersError {
-    fn into_error(self) -> Option<VipersWrappedError>;
+    /// Converts the value into a [VipersWrappedError].
+    fn into_error(self) -> Option<ComparableError>;
 }
 
 impl IntoVipersError for anchor_lang::error::Error {
-    fn into_error(self) -> Option<VipersWrappedError> {
-        Some(VipersWrappedError(self))
+    fn into_error(self) -> Option<ComparableError> {
+        Some(ComparableError(self))
     }
 }
 
 impl IntoVipersError for Option<anchor_lang::error::Error> {
-    fn into_error(self) -> Option<VipersWrappedError> {
+    fn into_error(self) -> Option<ComparableError> {
         self?.into_error()
     }
 }
 
-impl From<anchor_lang::error::Error> for VipersWrappedError {
+impl From<anchor_lang::error::Error> for ComparableError {
     fn from(err: anchor_lang::error::Error) -> Self {
-        VipersWrappedError(err)
+        ComparableError(err)
     }
 }
 
-/// Vipers wrapped error for testing purposes.
+/// An error that can be compared (via equality) to other errors.
 #[repr(transparent)]
 #[derive(Debug)]
-pub struct VipersWrappedError(pub anchor_lang::error::Error);
+pub struct ComparableError(pub anchor_lang::error::Error);
 
-impl PartialEq for VipersWrappedError {
+impl PartialEq for ComparableError {
     fn eq(&self, other: &Self) -> bool {
-        let (VipersWrappedError(a), VipersWrappedError(b)) = (self, other);
+        let (ComparableError(a), ComparableError(b)) = (self, other);
         match (a, b) {
             (Error::AnchorError(err_a), Error::AnchorError(err_b)) => {
                 err_a.error_code_number == err_b.error_code_number
@@ -71,9 +73,9 @@ impl PartialEq for VipersWrappedError {
     }
 }
 
-impl Eq for VipersWrappedError {}
+impl Eq for ComparableError {}
 
-impl Display for VipersWrappedError {
+impl Display for ComparableError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.0.fmt(f)
     }
