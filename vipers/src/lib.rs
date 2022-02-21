@@ -4,10 +4,12 @@
 #![allow(rustdoc::missing_doc_code_examples)]
 
 pub mod assert;
+mod error;
 mod keyref;
 pub mod validate;
 
 use anchor_lang::prelude::*;
+pub use error::*;
 pub use keyref::AsKeyRef;
 #[cfg(feature = "spl-associated-token-account")]
 pub use spl_associated_token_account as ata;
@@ -52,30 +54,4 @@ pub mod prelude {
         unwrap_checked, unwrap_int, unwrap_opt, unwrap_opt_block, unwrap_or_err, AsKeyRef,
         Validate, VipersError,
     };
-}
-
-/// Vipers validation error.
-#[allow(missing_docs)]
-#[error(offset = 1100)]
-pub enum VipersError {
-    #[msg("Keys do not match.")]
-    KeyMismatch,
-    #[msg("Associated token account does not match.")]
-    ATAMismatch,
-    #[msg("Program ID does not match.")]
-    ProgramIDMismatch,
-    #[msg("Integer overflow.")]
-    IntegerOverflow,
-    #[msg("The provided account is not owned by the specified program.")]
-    OwnerMismatch,
-    #[msg("The provided token account is not an associated token account.")]
-    InvalidATA,
-    #[msg("Invariant failed.")]
-    InvariantFailed,
-    #[msg("Option unwrap failed.")]
-    OptionUnwrapFailed,
-    #[msg("Keys must not match.")]
-    KeysMustNotMatch,
-    #[msg("The provided token account is non-zero: amount must be zero, it should not have a delegate, and it should not have a close authority.")]
-    TokenAccountIsNonZero,
 }

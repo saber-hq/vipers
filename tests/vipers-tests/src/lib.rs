@@ -1,26 +1,6 @@
 //! Vipers tests for Anchor 0.20.1.
 #![cfg(test)]
 
-#[cfg(feature = "anchor-0_21_0")]
-extern crate anchor_lang_0_21_0 as anchor_lang;
-#[cfg(feature = "anchor-0_21_0")]
-extern crate anchor_spl_0_21_0 as anchor_spl;
-
-#[cfg(feature = "anchor-0_20_1")]
-extern crate anchor_lang_0_20_1 as anchor_lang;
-#[cfg(feature = "anchor-0_20_1")]
-extern crate anchor_spl_0_20_1 as anchor_spl;
-
-#[cfg(feature = "anchor-0_19_0")]
-extern crate anchor_lang_0_19_0 as anchor_lang;
-#[cfg(feature = "anchor-0_19_0")]
-extern crate anchor_spl_0_19_0 as anchor_spl;
-
-#[cfg(feature = "anchor-0_18_2")]
-extern crate anchor_lang_0_18_2 as anchor_lang;
-#[cfg(feature = "anchor-0_18_2")]
-extern crate anchor_spl_0_18_2 as anchor_spl;
-
 use anchor_lang::prelude::*;
 
 declare_id!("VipersTest111111111111111111111111111111111");
@@ -31,7 +11,7 @@ use anchor_spl::{
 };
 use vipers::*;
 
-#[error]
+#[error_code]
 pub enum ErrorCode {
     MyError,
 }
@@ -44,7 +24,7 @@ struct TestData {
 
 #[test]
 #[allow(deprecated)]
-pub fn test_compiles_deprecated() -> ProgramResult {
+pub fn test_compiles_deprecated() -> Result<()> {
     assert_keys!(token::ID, token::ID, "token program");
 
     Ok(())
@@ -52,7 +32,7 @@ pub fn test_compiles_deprecated() -> ProgramResult {
 
 #[test]
 #[allow(deprecated)]
-pub fn test_compiles() -> ProgramResult {
+pub fn test_compiles() -> Result<()> {
     let ata = get_associated_token_address(&token::ID, &token::ID);
     assert_ata!(ata, token::ID, token::ID, "ATA");
 
@@ -65,7 +45,7 @@ pub fn test_compiles() -> ProgramResult {
 
 #[test]
 #[allow(deprecated)]
-fn test_assert_owner() -> ProgramResult {
+fn test_assert_owner() -> Result<()> {
     let mut lamports: u64 = 8 + (TestData::default().try_to_vec().unwrap().len() as u64);
 
     let mut buffer: [u8; 16] = [0; 16];
@@ -88,7 +68,7 @@ fn test_assert_owner() -> ProgramResult {
 }
 
 #[test]
-fn test_unwrap_checked() -> ProgramResult {
+fn test_unwrap_checked() -> Result<()> {
     assert_throws!(
         {
             unwrap_checked!({
@@ -169,10 +149,9 @@ fn test_assert_keys_eq_pass() {
     });
 }
 
-use crate::anchor_lang::solana_program::program_pack::Pack;
+use anchor_lang::solana_program::program_pack::Pack;
 
 #[test]
-#[cfg(feature = "anchor-0_21_0")]
 fn test_assert_keys_eq_boxed() {
     let key = Pubkey::new_unique();
     let lamports = &mut 0;

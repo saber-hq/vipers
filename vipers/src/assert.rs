@@ -1,10 +1,10 @@
 //! Various assertions.
 
-/// Runs a block, returning a [anchor_lang::prelude::ProgramResult].
+/// Runs a block, returning a [anchor_lang::prelude::Result<()>].
 #[macro_export]
 macro_rules! test_assertion {
     ($body: block) => {
-        (|| -> ProgramResult {
+        (|| -> crate::Result<()> {
             $body
             Ok(())
         })()
@@ -17,7 +17,7 @@ macro_rules! test_assertion {
 #[macro_export]
 macro_rules! assert_does_not_throw {
     ($body: block $(,)?) => {
-        assert_eq!($crate::test_assertion!($body), Ok(()))
+        assert_eq!($crate::test_assertion!($body).unwrap(), ())
     };
 }
 
@@ -27,7 +27,10 @@ macro_rules! assert_does_not_throw {
 #[macro_export]
 macro_rules! assert_throws {
     ($body: block, $right: expr $(,)?) => {
-        assert_eq!($crate::test_assertion!($body), Err($right.into()))
+        assert!($crate::check_errors_equal(
+            $crate::test_assertion!($body).err(),
+            Some(error!($right))
+        ))
     };
 }
 
@@ -37,12 +40,12 @@ macro_rules! assert_throws {
 ///
 /// ```
 /// # use anchor_lang::prelude::*;
-/// #[error]
+/// #[error_code]
 /// pub enum ErrorCode {
 ///   #[msg("This is my error")]
 ///   MyError
 /// }
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// assert_eq!(format_err!(ErrorCode::MyError), "MyError: This is my error");
 /// # Ok(())
 /// # }
@@ -60,9 +63,9 @@ macro_rules! format_err {
 ///
 /// ```
 /// # use anchor_lang::prelude::*;
-/// # #[error]
+/// # #[error_code]
 /// # pub enum ErrorCode { MyError }
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// let fail = false;
 /// if fail {
 ///     return program_err!(MyError);
@@ -93,7 +96,7 @@ macro_rules! log_code_location {
 ///
 /// ```
 /// # use anchor_lang::prelude::*;
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// let result = unwrap_opt_block!({
 ///     let one: u64 = 1;
 ///     let three: u64 = 3;
@@ -119,7 +122,7 @@ macro_rules! unwrap_opt_block {
 ///
 /// ```
 /// # use anchor_lang::prelude::*;
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// let result = unwrap_checked!({
 ///   let one: u64 = 1;
 ///   let three: u64 = 3;
@@ -142,9 +145,9 @@ macro_rules! unwrap_checked {
 ///
 /// ```
 /// # use anchor_lang::prelude::*;
-/// # #[error]
+/// # #[error_code]
 /// # pub enum ErrorCode { MyError }
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// let fail = false;
 /// if fail {
 ///     throw_err!(MyError);
@@ -159,7 +162,7 @@ macro_rules! throw_err {
     };
     ($error:expr $(,)?) => {
         $crate::log_code_location!();
-        return Err($error.into());
+        return Err(anchor_lang::prelude::error!($error));
     };
 }
 
@@ -269,9 +272,9 @@ macro_rules! assert_owner {
 ///
 /// ```should_panic
 /// # use anchor_lang::prelude::*;
-/// # #[error]
+/// # #[error_code]
 /// # pub enum ErrorCode { MyError }
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// let one = anchor_lang::solana_program::sysvar::clock::ID;
 /// let two = anchor_lang::solana_program::system_program::ID;
 /// assert_keys_eq!(one, two); // throws an error
@@ -281,9 +284,9 @@ macro_rules! assert_owner {
 ///
 /// ```should_panic
 /// # use anchor_lang::prelude::*;
-/// # #[error]
+/// # #[error_code]
 /// # pub enum ErrorCode { MyError }
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// let one = anchor_lang::solana_program::sysvar::clock::ID;
 /// let two = anchor_lang::solana_program::system_program::ID;
 /// assert_keys_eq!(one, two, "invalid"); // throws an error
@@ -340,7 +343,7 @@ macro_rules! assert_keys_eq {
 /// # #[macro_use] extern crate vipers;
 /// # use anchor_lang::prelude::*;
 /// # use anchor_spl::token::*;
-/// #[error]
+/// #[error_code]
 /// pub enum ErrorCode { MyError }
 ///
 /// # fn main() {
@@ -409,7 +412,7 @@ macro_rules! assert_is_zero_token_account {
 /// # use anchor_lang::prelude::*;
 /// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
 /// # pub enum ErrorCode { MyError }
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// let one = Pubkey::default();
 /// let two = Pubkey::default();
 /// assert_keys_neq!(one, two); // throws an error
@@ -462,7 +465,7 @@ macro_rules! assert_keys_neq {
 /// # use anchor_lang::prelude::*;
 /// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
 /// # pub enum ErrorCode { MyError }
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// let one = 1_u64;
 /// let two = 2_u64;
 /// let my_value = unwrap_or_err!(one.checked_sub(2), MyError); // throws an error
@@ -482,7 +485,7 @@ macro_rules! unwrap_or_err {
 ///
 /// ```should_panic
 /// # use anchor_lang::prelude::*;
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// let one = 1_u64;
 /// let two = 2_u64;
 /// let my_value = unwrap_int!(one.checked_sub(2)); // returns an error
@@ -504,8 +507,8 @@ macro_rules! unwrap_int {
 /// # use anchor_lang::prelude::*;
 /// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
 /// # pub enum ErrorCode { MyError }
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
-/// fn function_returning_result() -> Result<u64, u64> {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
+/// fn function_returning_result() -> Result<u64> {
 ///     Err(123)
 /// }
 ///
@@ -526,7 +529,7 @@ macro_rules! try_or_err {
 ///
 /// ```should_panic
 /// # use anchor_lang::prelude::*;
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// invariant!(1 == 2, "incorrect");
 /// # Ok(()) }
 /// ```
@@ -535,7 +538,7 @@ macro_rules! try_or_err {
 ///
 /// ```
 /// # use anchor_lang::prelude::*;
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// invariant!(1 == 1, "won't throw");
 /// # Ok(()) }
 /// ```
@@ -544,7 +547,7 @@ macro_rules! try_or_err {
 ///
 /// ```
 /// # use anchor_lang::prelude::*;
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// invariant!(1 == 1);
 /// # Ok(()) }
 /// ```
@@ -554,7 +557,7 @@ macro_rules! try_or_err {
 /// ```
 /// # #[macro_use] extern crate vipers;
 /// # use anchor_lang::prelude::*;
-/// #[error]
+/// #[error_code]
 /// pub enum ErrorCode { MyError }
 ///
 /// # fn main() {
@@ -614,7 +617,7 @@ macro_rules! invariant {
 ///
 /// ```should_panic
 /// # use anchor_lang::prelude::*;
-/// # #[macro_use] extern crate vipers; fn main() -> ProgramResult {
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// let one = 1_u64;
 /// let two = 2_u64;
 /// let my_value = unwrap_opt!(one.checked_sub(2), "cannot do this"); // returns an error
@@ -639,11 +642,11 @@ macro_rules! unwrap_opt {
         $crate::unwrap_opt!($option, $err, $crate::format_err!($err))
     };
     ($option:expr, $err:expr, $msg: expr $(,)?) => {
-        $option.ok_or_else(|| -> ProgramError {
+        $option.ok_or_else(|| -> anchor_lang::error::Error {
             msg!("Option unwrap failed: {:?}", $err);
             msg!(stringify!($option));
             $crate::log_code_location!();
-            $err.into()
+            anchor_lang::prelude::error!($err)
         })?
     };
 }
