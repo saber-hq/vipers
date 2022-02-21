@@ -1,14 +1,12 @@
 # vipers-tests
 
-This Crate contains tests intended to be run against multiple versions of Anchor.
+This Crate contains tests for Vipers.
 
 ## Running
 
 ```bash
-cargo test --features anchor-0_18_2 --no-default-features
+cargo test
 ```
-
-View the [Cargo.toml](./Cargo.toml) for a full list of supported Anchor versions.
 
 ## License
 

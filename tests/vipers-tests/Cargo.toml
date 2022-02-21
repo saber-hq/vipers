@@ -9,22 +9,9 @@ license = "Apache-2.0"
 edition = "2021"
 keywords = ["solana", "saber", "anchor"]
 
-[features]
-default = ["anchor-0_21_0"]
-anchor-0_21_0 = ["anchor-lang-0_21_0", "anchor-spl-0_21_0"]
-anchor-0_20_1 = ["anchor-lang-0_20_1", "anchor-spl-0_20_1"]
-anchor-0_19_0 = ["anchor-lang-0_19_0", "anchor-spl-0_19_0"]
-anchor-0_18_2 = ["anchor-lang-0_18_2", "anchor-spl-0_18_2"]
-
 [dependencies]
-anchor-lang-0_21_0 = { version = "=0.21.0", package = "anchor-lang", optional = true }
-anchor-spl-0_21_0 = { version = "=0.21.0", package = "anchor-spl", optional = true }
-anchor-lang-0_20_1 = { version = "=0.20.1", package = "anchor-lang", optional = true }
-anchor-spl-0_20_1 = { version = "=0.20.1", package = "anchor-spl", optional = true }
-anchor-lang-0_19_0 = { version = "=0.19.0", package = "anchor-lang", optional = true }
-anchor-spl-0_19_0 = { version = "=0.19.0", package = "anchor-spl", optional = true }
-anchor-lang-0_18_2 = { version = "=0.18.2", package = "anchor-lang", optional = true }
-anchor-spl-0_18_2 = { version = "=0.18.2", package = "anchor-spl", optional = true }
+anchor-lang = "^0.22"
+anchor-spl = "^0.22"
 vipers = { path = "../../vipers", version = "^1", features = [
     "spl-associated-token-account"
 ] }
