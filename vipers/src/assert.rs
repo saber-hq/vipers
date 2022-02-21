@@ -505,11 +505,11 @@ macro_rules! unwrap_int {
 ///
 /// ```should_panic
 /// # use anchor_lang::prelude::*;
-/// # impl From<ErrorCode> for ProgramError { fn from(code: ErrorCode) -> Self { ProgramError::Custom(10) } }
+/// # #[error_code]
 /// # pub enum ErrorCode { MyError }
 /// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// fn function_returning_result() -> Result<u64> {
-///     Err(123)
+///     Err(error!(ErrorCode::MyError))
 /// }
 ///
 /// let my_value = try_or_err!(function_returning_result(), MyError);
@@ -518,7 +518,7 @@ macro_rules! unwrap_int {
 #[macro_export]
 macro_rules! try_or_err {
     ($result:expr, $error:ident $(,)?) => {
-        $result.map_err(|_| -> ProgramError { crate::ErrorCode::$error.into() })?
+        $result.map_err(|_| -> anchor_lang::error::Error { error!(crate::ErrorCode::$error) })?
     };
 }
 
