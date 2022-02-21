@@ -1,5 +1,7 @@
 #![allow(missing_docs)]
 
+use std::fmt::Display;
+
 use anchor_lang::prelude::*;
 
 /// Vipers validation error.
@@ -27,32 +29,106 @@ pub enum VipersError {
     TokenAccountIsNonZero,
 }
 
-pub trait IntoError {
-    fn into_error(self) -> Option<Error>;
+pub trait IntoVipersError {
+    fn into_error(self) -> Option<VipersWrappedError>;
 }
 
-impl IntoError for anchor_lang::error::Error {
-    fn into_error(self) -> Option<Error> {
-        Some(self)
+impl IntoVipersError for anchor_lang::error::Error {
+    fn into_error(self) -> Option<VipersWrappedError> {
+        Some(VipersWrappedError(self))
     }
 }
 
-impl IntoError for Option<anchor_lang::error::Error> {
-    fn into_error(self) -> Option<Error> {
+impl IntoVipersError for Option<anchor_lang::error::Error> {
+    fn into_error(self) -> Option<VipersWrappedError> {
         self?.into_error()
     }
 }
 
-/// Checks if two [anchor_lang::error::Error]s are equal.
-pub fn check_errors_equal<A: IntoError, B: IntoError>(a: A, b: B) -> bool {
-    match (a.into_error(), b.into_error()) {
-        (Some(Error::AnchorError(err_a)), Some(Error::AnchorError(err_b))) => {
-            err_a.error_code_number == err_b.error_code_number
+impl From<anchor_lang::error::Error> for VipersWrappedError {
+    fn from(err: anchor_lang::error::Error) -> Self {
+        VipersWrappedError(err)
+    }
+}
+
+/// Vipers wrapped error for testing purposes.
+#[repr(transparent)]
+#[derive(Debug)]
+pub struct VipersWrappedError(pub anchor_lang::error::Error);
+
+impl PartialEq for VipersWrappedError {
+    fn eq(&self, other: &Self) -> bool {
+        let (VipersWrappedError(a), VipersWrappedError(b)) = (self, other);
+        match (a, b) {
+            (Error::AnchorError(err_a), Error::AnchorError(err_b)) => {
+                err_a.error_code_number == err_b.error_code_number
+            }
+            (Error::ProgramError(err_a), Error::ProgramError(err_b)) => {
+                err_a.program_error == err_b.program_error
+            }
+            _ => false,
         }
-        (Some(Error::ProgramError(err_a)), Some(Error::ProgramError(err_b))) => {
-            err_a.program_error == err_b.program_error
-        }
-        (None, None) => true,
-        _ => false,
+    }
+}
+
+impl Eq for VipersWrappedError {}
+
+impl Display for VipersWrappedError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_program_errors_equal() {
+        assert_eq!(
+            anchor_lang::error::Error::ProgramError(ProgramError::InvalidArgument.into())
+                .into_error(),
+            anchor_lang::error::Error::ProgramError(ProgramError::InvalidArgument.into())
+                .into_error()
+        );
+    }
+
+    #[test]
+    fn test_program_errors_equal_custom() {
+        assert_eq!(
+            anchor_lang::error::Error::ProgramError(ProgramError::Custom(10).into()).into_error(),
+            anchor_lang::error::Error::ProgramError(ProgramError::Custom(10).into()).into_error()
+        );
+    }
+
+    #[test]
+    fn test_program_errors_mismatch() {
+        assert_ne!(
+            anchor_lang::error::Error::ProgramError(ProgramError::InvalidArgument.into())
+                .into_error(),
+            anchor_lang::error::Error::ProgramError(ProgramError::AccountAlreadyInitialized.into())
+                .into_error()
+        );
+    }
+
+    #[test]
+    fn test_program_errors_mismatch_custom() {
+        assert_ne!(
+            anchor_lang::error::Error::ProgramError(ProgramError::Custom(10).into()).into_error(),
+            anchor_lang::error::Error::ProgramError(ProgramError::Custom(11).into()).into_error()
+        );
+    }
+
+    #[test]
+    fn test_program_errors_equal_none() {
+        assert_eq!(None.into_error(), None.into_error());
+    }
+
+    #[test]
+    fn test_program_errors_mismatch_random() {
+        assert_ne!(
+            None.into_error(),
+            anchor_lang::error::Error::ProgramError(ProgramError::Custom(11).into()).into_error()
+        );
     }
 }

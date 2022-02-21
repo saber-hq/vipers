@@ -17,7 +17,7 @@ macro_rules! test_assertion {
 #[macro_export]
 macro_rules! assert_does_not_throw {
     ($body: block $(,)?) => {
-        assert_eq!($crate::test_assertion!($body).unwrap(), ())
+        assert!($crate::test_assertion!($body).is_ok())
     };
 }
 
@@ -27,10 +27,10 @@ macro_rules! assert_does_not_throw {
 #[macro_export]
 macro_rules! assert_throws {
     ($body: block, $right: expr $(,)?) => {
-        assert!($crate::check_errors_equal(
-            $crate::test_assertion!($body).err(),
-            Some(error!($right))
-        ))
+        assert_eq!(
+            $crate::IntoVipersError::into_error($crate::test_assertion!($body).err()),
+            $crate::IntoVipersError::into_error(Some(::anchor_lang::prelude::error!($right)))
+        )
     };
 }
 
@@ -162,7 +162,7 @@ macro_rules! throw_err {
     };
     ($error:expr $(,)?) => {
         $crate::log_code_location!();
-        return Err(anchor_lang::prelude::error!($error));
+        return Err(::anchor_lang::prelude::error!($error));
     };
 }
 
@@ -509,7 +509,7 @@ macro_rules! unwrap_int {
 /// # pub enum ErrorCode { MyError }
 /// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
 /// fn function_returning_result() -> Result<u64> {
-///     Err(error!(ErrorCode::MyError))
+///     err!(ErrorCode::MyError)
 /// }
 ///
 /// let my_value = try_or_err!(function_returning_result(), MyError);
@@ -518,7 +518,7 @@ macro_rules! unwrap_int {
 #[macro_export]
 macro_rules! try_or_err {
     ($result:expr, $error:ident $(,)?) => {
-        $result.map_err(|_| -> anchor_lang::error::Error { error!(crate::ErrorCode::$error) })?
+        $result.or_else(|_| -> ::anchor_lang::Result<_> { ::anchor_lang::prelude::err!($error) })?
     };
 }
 
