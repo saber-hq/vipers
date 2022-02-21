@@ -9,6 +9,7 @@ pub mod validate;
 
 use anchor_lang::prelude::*;
 pub use keyref::AsKeyRef;
+#[cfg(feature = "spl-associated-token-account")]
 pub use spl_associated_token_account as ata;
 
 pub use validate::Validate;
