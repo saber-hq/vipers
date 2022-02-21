@@ -1,4 +1,4 @@
-//! Vipers tests for Anchor 0.20.1.
+//! Vipers tests.
 #![cfg(test)]
 
 use anchor_lang::prelude::*;
