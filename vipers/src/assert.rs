@@ -28,8 +28,8 @@ macro_rules! assert_does_not_throw {
 macro_rules! assert_throws {
     ($body: block, $right: expr $(,)?) => {
         assert_eq!(
-            $crate::IntoVipersError::into_error($crate::test_assertion!($body).err()),
-            $crate::IntoVipersError::into_error(Some(::anchor_lang::prelude::error!($right)))
+            $crate::IntoCmpError::into_cmp_error($crate::test_assertion!($body).err()),
+            $crate::IntoCmpError::into_cmp_error(Some(::anchor_lang::prelude::error!($right)))
         )
     };
 }
