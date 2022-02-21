@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Make `spl-associated-token-account` an optional dependency ([#32](https://github.com/saber-hq/vipers/pull/32)).
+
 ## [1.6.0] - 2022-02-14
 
 ### Fixes
