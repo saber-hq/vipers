@@ -43,24 +43,6 @@ jobs:
         uses: Swatinem/rust-cache@v1
       - run: cargo check
 
-  test-anchor:
-    name: Cross-Anchor Version Unit Tests
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        anchor-version: [0_21_0, 0_20_1, 0_19_0, 0_18_2]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install Rust nightly
-        uses: actions-rs/toolchain@v1
-        with:
-          override: true
-          profile: minimal
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
-          components: rustfmt, clippy
-      - uses: Swatinem/rust-cache@v1
-      - run: cargo test --package vipers-tests --features anchor-${{ matrix.anchor-version }} --no-default-features
-
   test:
     name: Unit Tests
     runs-on: ubuntu-latest
