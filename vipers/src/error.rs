@@ -88,6 +88,7 @@ impl Display for CmpError {
 }
 
 #[cfg(test)]
+#[cfg(not(tarpaulin_include))]
 mod tests {
     use super::*;
 
@@ -145,6 +146,24 @@ mod tests {
         );
     }
 
+    #[test]
+    fn test_program_errors_mismatch_anchor_program() {
+        assert_ne!(
+            error!(ErrorCode::MyError).into_cmp_error(),
+            anchor_lang::error::Error::ProgramError(ProgramError::Custom(11).into())
+                .into_cmp_error()
+        );
+    }
+
+    #[test]
+    fn test_display_anchor_error() {
+        let anchor_error = error!(ErrorCode::MyError);
+        assert_eq!(
+            format!("{}", anchor_error),
+            format!("{}", anchor_error.into_cmp_error().unwrap())
+        );
+    }
+
     #[error_code]
     pub enum ErrorCode {
         MyError,
@@ -173,5 +192,12 @@ mod tests {
             (err!(ErrorCode::MyError) as Result<()>).into_cmp_error(),
             (err!(ErrorCode::MyOtherError) as Result<()>).into_cmp_error(),
         );
+    }
+
+    #[test]
+    fn test_from_anchor_error() {
+        let error_a: CmpError = (error!(ErrorCode::MyError)).into();
+        let error_b: CmpError = (error!(ErrorCode::MyError)).into();
+        assert_eq!(error_a, error_b);
     }
 }
