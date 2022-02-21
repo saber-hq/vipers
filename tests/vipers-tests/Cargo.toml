@@ -12,7 +12,7 @@ keywords = ["solana", "saber", "anchor"]
 [dependencies]
 anchor-lang = "^0.22"
 anchor-spl = "^0.22"
-vipers = { path = "../../vipers", version = "^1", features = [
+vipers = { path = "../../vipers", version = "^2", features = [
     "spl-associated-token-account"
 ] }
 
