@@ -27,6 +27,8 @@ pub enum VipersError {
     KeysMustNotMatch,
     #[msg("The provided token account is non-zero: amount must be zero, it should not have a delegate, and it should not have a close authority.")]
     TokenAccountIsNonZero,
+    #[msg("Bump not found.")]
+    UnknownBump,
 }
 
 /// Conversions into a [CmpError].
