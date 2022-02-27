@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased Changes
 
+## [2.0.1] - 2022-02-27
+
 ### Features
 
 - Adds the `unwrap_bump!` macro, which extracts the bump from the instruction `Context` ([#36](https://github.com/saber-hq/vipers/pull/36)).
