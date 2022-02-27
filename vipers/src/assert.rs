@@ -499,6 +499,31 @@ macro_rules! unwrap_int {
     };
 }
 
+/// Unwraps a bump seed.
+///
+/// # Example
+///
+/// ```ignore
+/// # use anchor_lang::prelude::*;
+/// # #[macro_use] extern crate vipers; fn main() -> Result<()> {
+/// fn my_instruction(ctx: Context<MyAccounts>) -> Result<()> {
+///     let my_data = &mut ctx.accounts.my_data
+///     my_data.bump = unwrap_bump!(ctx, "my_data");
+///     Ok(())
+/// }
+/// # }
+/// ```
+#[macro_export]
+macro_rules! unwrap_bump {
+    ($ctx:expr, $bump:literal $(,)?) => {
+        *$crate::unwrap_opt!(
+            $ctx.bumps.get($bump),
+            $crate::VipersError::UnknownBump,
+            format!("Unknown bump: {}", $bump)
+        )
+    };
+}
+
 /// Tries to unwrap the [Result], otherwise returns the error
 ///
 /// # Example
