@@ -12,11 +12,12 @@
       let
         pkgs = import nixpkgs { inherit system; }
           // saber-overlay.packages.${system};
-      in {
+      in
+      {
         packages.cargo-workspaces = pkgs.cargo-workspaces;
         devShell = pkgs.mkShell {
           buildInputs = with pkgs;
-            [ libiconv anchor-0_20_0 cargo-workspaces ]
+            [ libiconv anchor-0_22_0 cargo-workspaces ]
             ++ (lib.optionals stdenv.isDarwin
               (with darwin.apple_sdk.frameworks; [ AppKit IOKit Foundation ]));
         };
