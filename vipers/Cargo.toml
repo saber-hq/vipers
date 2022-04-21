@@ -13,7 +13,7 @@ keywords = ["solana", "saber", "anchor"]
 [dependencies]
 anchor-lang = ">=0.22, <=0.24"
 anchor-spl = ">=0.22, <=0.24"
-spl-associated-token-account = { version = "^1.0.3", features = [
+spl-associated-token-account = { version = "^1.0.5", features = [
     "no-entrypoint"
 ], optional = true }
 
