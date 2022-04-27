@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased Changes
 
+## [2.0.4] - 2022-04-27
+
+### Features
+
+- Add `now()` and `now_i64()` time helpers.
+
 ## [2.0.3] - 2022-04-14
 
 ### Features
