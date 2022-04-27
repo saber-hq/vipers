@@ -1274,6 +1274,7 @@ version = "2.0.3"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
+ "num-traits",
  "spl-associated-token-account",
  "spl-token",
  "static-pubkey",

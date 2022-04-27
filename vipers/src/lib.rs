@@ -46,12 +46,24 @@ pub fn validate_derived_address(
     }
 }
 
+/// Helper for getting the current timestamp.
+pub fn now_i64() -> Result<i64> {
+    Ok(Clock::get()?.unix_timestamp)
+}
+
+/// Helper for getting the current timestamp as any convertible type.
+pub fn now<T: TryFrom<i64>>() -> Result<T> {
+    now_i64()?
+        .try_into()
+        .map_err(|_| ::anchor_lang::prelude::error!(VipersError::IntegerOverflow))
+}
+
 pub mod prelude {
     //! The prelude contains all commonly used components of the crate. All programs should include it via `use vipers::prelude::*;`.
 
     pub use super::{
-        assert_is_zero_token_account, assert_keys_eq, assert_keys_neq, invariant, try_or_err,
-        unwrap_bump, unwrap_checked, unwrap_int, unwrap_opt, unwrap_opt_block, unwrap_or_err,
-        AsKeyRef, CmpError, IntoCmpError, Validate, VipersError,
+        assert_is_zero_token_account, assert_keys_eq, assert_keys_neq, invariant, now, now_i64,
+        try_or_err, unwrap_bump, unwrap_checked, unwrap_int, unwrap_opt, unwrap_opt_block,
+        unwrap_or_err, AsKeyRef, CmpError, IntoCmpError, Validate, VipersError,
     };
 }
