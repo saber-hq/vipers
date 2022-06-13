@@ -24,4 +24,4 @@ spl-associated-token-account = { version = "^1.0.3", features = [
 
 [dev-dependencies]
 spl-token = { version = "^3", features = ["no-entrypoint"] }
-static-pubkey = "^1.0.2"
+static-pubkey = "^1.0.3"
