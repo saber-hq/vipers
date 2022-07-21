@@ -84,6 +84,7 @@ macro_rules! program_err {
 #[macro_export]
 macro_rules! log_code_location {
     () => {
+        #[cfg(feature = "show-error-locations")]
         msg!("Error thrown at {}:{}", file!(), line!());
     };
 }
