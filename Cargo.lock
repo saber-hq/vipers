@@ -1154,9 +1154,9 @@ checksum = "f2dd574626839106c320a323308629dcb1acfc96e32a8cba364ddc61ac23ee83"
 
 [[package]]
 name = "solana-frozen-abi"
-version = "1.10.30"
+version = "1.10.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d633edac96c0d19c81a0ea4c6dd04312dbaf0d2979dedb7232bab73c1bb853a7"
+checksum = "95185172953a206d2aae8e4448d8f295c9b6e3304c43efded5192d3cc5b99d04"
 dependencies = [
  "bs58 0.4.0",
  "bv",
@@ -1176,9 +1176,9 @@ dependencies = [
 
 [[package]]
 name = "solana-frozen-abi-macro"
-version = "1.10.30"
+version = "1.10.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4812efee366c0ef684c3fe613e30f5bd2e9445cd6e5a4322a6222a182ca0544"
+checksum = "289cfcb10682a5338f7eb2d6b1c3564975176ec7e4fb3ee1d3ff5c52f4c397fd"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1188,9 +1188,9 @@ dependencies = [
 
 [[package]]
 name = "solana-program"
-version = "1.10.30"
+version = "1.10.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec172845766252c7bdb7e32139c392f76741a269babccaec18f7ba68948c2c91"
+checksum = "7eca3c0f4eec9c7df7c950ac2410ccbbc9beecba19da3135c3ed68425242bb96"
 dependencies = [
  "base64 0.13.0",
  "bincode",
@@ -1230,9 +1230,9 @@ dependencies = [
 
 [[package]]
 name = "solana-sdk-macro"
-version = "1.10.30"
+version = "1.10.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0a88616834b55ac05375e9b6859288e182281ce7b358f9d5138ec6a35497afbf"
+checksum = "dbabfc15b3d4ae7cb725b7959cf9de3ad29b53a76ec0babe6c2cb36049d2c582"
 dependencies = [
  "bs58 0.4.0",
  "proc-macro2",
@@ -1254,11 +1254,12 @@ dependencies = [
 
 [[package]]
 name = "spl-token"
-version = "3.3.0"
+version = "3.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0cc67166ef99d10c18cb5e9c208901e6d8255c6513bb1f877977eba48e6cc4fb"
+checksum = "32d05653bed5932064a287340dbc8a3cb298ee717e5c7ec3353d7cdb9f8fb7e1"
 dependencies = [
  "arrayref",
+ "bytemuck",
  "num-derive",
  "num-traits",
  "num_enum",
