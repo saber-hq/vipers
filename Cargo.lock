@@ -1268,9 +1268,9 @@ dependencies = [
 
 [[package]]
 name = "static-pubkey"
-version = "1.0.2"
+version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e390e1e75910fd6c02265a4743f06c85775bb357c70f58384e867b3dc84a8011"
+checksum = "0547d5945c93f55e1b18bf2a67d1a3d0548561f2687645b22c1c1d4fbb9a8e90"
 dependencies = [
  "bs58 0.4.0",
  "proc-macro2",
