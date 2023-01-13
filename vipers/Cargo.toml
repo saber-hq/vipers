@@ -11,8 +11,9 @@ readme = "../README.md"
 keywords = ["solana", "saber", "anchor"]
 
 [features]
-default = []
+default = ["show-error-locations"]
 ata = ["spl-associated-token-account"]
+show-error-locations = []
 
 [dependencies]
 anchor-lang = ">=0.22, <=0.25"
