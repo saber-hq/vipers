@@ -105,3 +105,20 @@ jobs:
         with:
           name: code-coverage-report
           path: cobertura.xml
+- ad: Önbellek
+  kullanımlar: eylemler/önbellek@v3.3.2
+  ile:
+    # Önbelleğe alınacak ve geri yüklenecek dosya, dizin ve joker karakter kalıplarının listesi
+    yol:
+    # Önbelleği geri yüklemek ve kaydetmek için açık bir anahtar
+    anahtar:
+    # Anahtar için önbellek isabeti oluşmaması durumunda eski önbelleği geri yüklemek için kullanılacak anahtarların sıralı listesi. Not: 'önbellek isabeti' bu durumda false değerini döndürür.
+    geri yükleme anahtarları: # isteğe bağlı
+    # Yükleme sırasında büyük dosyaları bayt cinsinden bölmek için kullanılan yığın boyutu
+    upload-chunk-size: # isteğe bağlı
+    # Etkinleştirildiğinde isteğe bağlı bir boole, Windows çalıştırıcılarının sırasıyla diğer platformlarda geri yüklenebilecek veya kaydedilebilecek önbellekleri kaydetmesine veya geri yüklemesine olanak tanır
+    activeCrossOsArchive: # isteğe bağlı, varsayılan değer false
+    # Önbellek girişi bulunamazsa iş akışı başarısız olur
+    önbellekte başarısızlık: # isteğe bağlı, varsayılan yanlıştır
+    # Önbelleği indirmeden, verilen giriş(ler) için (anahtar, geri yükleme anahtarları) bir önbellek girişinin olup olmadığını kontrol edin
+    salt arama: # isteğe bağlı, varsayılan değer false'tur
