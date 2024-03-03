@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased Changes
 
+### Features
+
+- Support Anchor v0.29
+
+### Breaking
+
+- Remove support for Anchor versions older than 0.29.0.
+- Remove support `unwrap_bump!` macro, because bump is extracted from the instruction `Context` explicitly since Anchor version 0.29.0.
+
 ## [2.0.5] - 2022-07-08
 
 ### Features

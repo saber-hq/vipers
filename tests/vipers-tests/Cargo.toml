@@ -10,10 +10,10 @@ edition = "2021"
 keywords = ["solana", "saber", "anchor"]
 
 [dependencies]
-anchor-lang = "^0.25"
-anchor-spl = "^0.25"
+anchor-lang = "^0.29"
+anchor-spl = "^0.29"
 vipers = { path = "../../vipers", version = "^2", features = [
-    "spl-associated-token-account"
+    "spl-associated-token-account",
 ] }
 
 [dev-dependencies]
