@@ -238,15 +238,15 @@ fn test_assert_keys_neq_no_match() {
 #[test]
 fn test_anchor_errors_eq_result() {
     assert_eq!(
-        (err!(MyError) as Result<()>).into_cmp_error(),
-        (err!(MyError) as Result<()>).into_cmp_error(),
+        (err!(ErrorCode::MyError) as Result<()>).into_cmp_error(),
+        (err!(ErrorCode::MyError) as Result<()>).into_cmp_error(),
     );
 }
 
 #[test]
 fn test_anchor_errors_ne_result() {
     assert_ne!(
-        (err!(MyError) as Result<()>).into_cmp_error(),
-        (err!(MyOtherError) as Result<()>).into_cmp_error(),
+        (err!(ErrorCode::MyError) as Result<()>).into_cmp_error(),
+        (err!(ErrorCode::MyOtherError) as Result<()>).into_cmp_error(),
     );
 }
